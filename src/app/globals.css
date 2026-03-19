@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-prism-1: #7B68EE;
+  --color-prism-2: #E879F9;
+  --color-prism-3: #38BDF8;
+  --color-prism-4: #F472B6;
+  --color-prism-5: #A78BFA;
+  --color-bg: #FAFAFE;
+  --color-card: #FFFFFF;
+  --color-text: #1E1B3A;
+  --color-muted: #6B6890;
+  --color-border: #E8E6F0;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Gradient hero */
+.hero-gradient {
+  background: linear-gradient(135deg, #7B68EE 0%, #E879F9 35%, #38BDF8 65%, #F472B6 100%);
+}
+
+.hero-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+
+.hero-gradient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(250,250,254,0) 70%, var(--color-bg) 100%);
+}
+
+/* Category pill active state */
+.pill-active {
+  background: var(--color-prism-1) !important;
+  border-color: var(--color-prism-1) !important;
+  color: white !important;
+}
+
+/* Card hover */
+.listing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(123, 104, 238, 0.1);
+  border-color: var(--color-prism-5);
+}
+
+/* Map pin shape */
+.map-pin {
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+.map-pin:hover {
+  transform: rotate(-45deg) scale(1.2);
+}
+.map-pin span {
+  transform: rotate(45deg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
