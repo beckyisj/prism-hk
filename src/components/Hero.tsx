@@ -36,7 +36,7 @@ export default function Hero({
   ];
 
   return (
-    <section className="hero-gradient relative overflow-hidden pt-14 pb-20">
+    <section className="hero-gradient relative overflow-hidden pt-28 pb-20">
       <div className="relative z-10 max-w-5xl mx-auto px-4 text-center text-white">
         {/* Title */}
         <h1
