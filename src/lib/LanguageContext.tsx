@@ -9,7 +9,7 @@ type LanguageContextType = {
 };
 
 const LanguageContext = createContext<LanguageContextType>({
-  language: "both",
+  language: "en",
   setLanguage: () => {},
 });
 
@@ -18,7 +18,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("prism-lang") as Language | null;
-    if (saved && ["en", "zh", "both"].includes(saved)) {
+    if (saved && ["en", "zh", "zh-Hans", "both"].includes(saved)) {
       setLanguageState(saved);
     }
   }, []);

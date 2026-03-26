@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/LanguageContext";
 import { CATEGORIES } from "@/lib/categories";
+import { isZh } from "@/lib/i18n";
 
 const IDENTITIES = {
   en: [
@@ -19,6 +20,15 @@ const IDENTITIES = {
     { value: "business", label: "商戶經營者" },
     { value: "healthcare", label: "醫療服務提供者" },
     { value: "researcher", label: "研究人員" },
+  ],
+  "zh-Hans": [
+    { value: "individual", label: "LGBTQ+ 人士" },
+    { value: "ally", label: "盟友" },
+    { value: "parent", label: "家长/家人" },
+    { value: "business", label: "雇主/同事" },
+    { value: "educator", label: "教育工作者" },
+    { value: "healthcare", label: "医疗提供者" },
+    { value: "researcher", label: "研究人员/记者" },
   ],
 };
 
@@ -39,6 +49,15 @@ const NEEDS = {
     { value: "events", label: "活動" },
     { value: "all", label: "全部" },
   ],
+  "zh-Hans": [
+    { value: "all", label: "全部" },
+    { value: "Community", label: "社区" },
+    { value: "Healthcare", label: "医疗" },
+    { value: "NGO", label: "法律权利" },
+    { value: "mental-health", label: "心理健康" },
+    { value: "events", label: "活动" },
+    { value: "Business", label: "职场资源" },
+  ],
 };
 
 export default function SmartDispatcher() {
@@ -47,13 +66,13 @@ export default function SmartDispatcher() {
   const [identity, setIdentity] = useState("individual");
   const [need, setNeed] = useState("all");
 
-  const lang = language === "zh" ? "zh" : "en";
+  const lang = isZh(language) ? (language === "zh-Hans" ? "zh-Hans" : "zh") : "en";
   const identities = IDENTITIES[lang];
   const needs = NEEDS[lang];
 
-  const iAmLabel = language === "zh" ? "我是" : "I am";
-  const lookingForLabel = language === "zh" ? "，想尋找" : " looking for ";
-  const exploreLabel = language === "zh" ? "探索" : "Explore";
+  const iAmLabel = isZh(language) ? "我是" : "I am";
+  const lookingForLabel = language === "zh-Hans" ? "，想寻找" : language === "zh" ? "，想尋找" : " looking for ";
+  const exploreLabel = isZh(language) ? "探索" : "Explore";
 
   function handleExplore() {
     if (need === "events") {

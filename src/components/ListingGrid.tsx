@@ -1,7 +1,7 @@
 "use client";
 
 import type { Listing } from "@/lib/supabase";
-import { getCategoryInfo, CATEGORIES } from "@/lib/categories";
+import { getCategoryInfo, getCategoryName, CATEGORIES } from "@/lib/categories";
 import { useLanguage } from "@/lib/LanguageContext";
 import { bilingualText, t } from "@/lib/i18n";
 import ListingCard from "./ListingCard";
@@ -22,17 +22,18 @@ export default function ListingGrid({ listings }: { listings: Listing[] }) {
   // Group listings by category, preserving CATEGORIES order
   const grouped = new Map<string, Listing[]>();
 
-  // Initialize with known category order
+  // Initialize with known category order (contains match for multi-category listings)
+  const placed = new Set<string>();
   for (const cat of CATEGORIES) {
-    const items = listings.filter((l) => l.category === cat.id);
+    const items = listings.filter((l) => l.category?.includes(cat.id));
     if (items.length > 0) {
       grouped.set(cat.id, items);
+      items.forEach((l) => placed.add(l.id));
     }
   }
 
-  // Add any remaining categories not in CATEGORIES
-  const knownIds = new Set<string>(CATEGORIES.map((c) => c.id));
-  const otherListings = listings.filter((l) => !knownIds.has(l.category));
+  // Add any remaining listings not matched to known categories
+  const otherListings = listings.filter((l) => !placed.has(l.id));
   if (otherListings.length > 0) {
     const otherGrouped = new Map<string, Listing[]>();
     for (const l of otherListings) {
@@ -49,7 +50,7 @@ export default function ListingGrid({ listings }: { listings: Listing[] }) {
     <div className="space-y-10">
       {Array.from(grouped.entries()).map(([categoryId, items]) => {
         const info = getCategoryInfo(categoryId);
-        const categoryName = bilingualText(info.en, info.zh, language);
+        const categoryName = getCategoryName(info as any, language);
 
         return (
           <section key={categoryId}>

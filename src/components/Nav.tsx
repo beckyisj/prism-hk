@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t } from "@/lib/i18n";
@@ -9,8 +10,8 @@ import { t } from "@/lib/i18n";
 type NavLink = {
   href: string;
   key: string;
-  label?: { en: string; zh: string };
-  children?: { href: string; label: { en: string; zh: string } }[];
+  label?: { en: string; zh: string; zhHans: string };
+  children?: { href: string; label: { en: string; zh: string; zhHans: string } }[];
 };
 
 const navLinks: NavLink[] = [
@@ -20,27 +21,28 @@ const navLinks: NavLink[] = [
     href: "/health",
     key: "health",
     children: [
-      { href: "/health", label: { en: "Health & Support", zh: "健康支援" } },
+      { href: "/health", label: { en: "Healthcare & Support", zh: "醫療及支援", zhHans: "医疗及支援" } },
       {
         href: "/emergency",
-        label: { en: "Emergency Services", zh: "緊急服務" },
+        label: { en: "Emergency Services", zh: "緊急支援", zhHans: "紧急支援" },
       },
     ],
   },
   { href: "/events", key: "events" },
   {
     href: "/learn",
-    key: "learn",
+    key: "more",
+    label: { en: "More", zh: "更多", zhHans: "更多" },
     children: [
-      { href: "/learn", label: { en: "About Us", zh: "關於我們" } },
+      { href: "/learn", label: { en: "About PRISM", zh: "關於 PRISM", zhHans: "关于 PRISM" } },
       {
         href: "/learn/resources",
-        label: { en: "Educational Resources", zh: "教育資源" },
+        label: { en: "Educational Resources", zh: "教育資源", zhHans: "教育资源" },
       },
+      { href: "/get-involved", label: { en: "Get Involved", zh: "參與", zhHans: "参与" } },
+      { href: "/support", label: { en: "Support Us", zh: "支持我們", zhHans: "支持我们" } },
     ],
   },
-  { href: "/get-involved", key: "getInvolved" },
-  { href: "/support", key: "support" },
 ];
 
 export default function Nav() {
@@ -55,10 +57,11 @@ export default function Nav() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E6F0]">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex-shrink-0">
+        <Link href="/" className="flex-shrink-0 flex items-center gap-3">
+          <Image src="/prism-logo.png" alt="PRISM" width={40} height={40} className="w-10 h-10" />
           <span
-            className="text-xl font-bold bg-gradient-to-r from-[#7B68EE] to-[#E879F9] bg-clip-text text-transparent"
-            style={{ fontFamily: "Inter, sans-serif" }}
+            className="text-3xl bg-gradient-to-r from-[#5EEDB8] via-[#F5C55A] to-[#EC4899] bg-clip-text text-transparent leading-none"
+            style={{ fontFamily: "'This Appeal', sans-serif", letterSpacing: "0.25em" }}
           >
             PRISM
           </span>
@@ -101,9 +104,11 @@ export default function Nav() {
                                 : "text-[#1E1B3A] hover:text-[#7B68EE] hover:bg-[#7B68EE]/5"
                             }`}
                           >
-                            {language === "zh"
-                              ? child.label.zh
-                              : child.label.en}
+                            {language === "zh-Hans"
+                              ? child.label.zhHans
+                              : language === "zh"
+                                ? child.label.zh
+                                : child.label.en}
                           </Link>
                         );
                       })}
@@ -208,9 +213,11 @@ export default function Nav() {
                                 : "text-[#4A4668] hover:text-[#7B68EE] hover:bg-[#7B68EE]/5"
                             }`}
                           >
-                            {language === "zh"
-                              ? child.label.zh
-                              : child.label.en}
+                            {language === "zh-Hans"
+                              ? child.label.zhHans
+                              : language === "zh"
+                                ? child.label.zh
+                                : child.label.en}
                           </Link>
                         );
                       })}

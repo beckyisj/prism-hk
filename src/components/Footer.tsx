@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
-import { t } from "@/lib/i18n";
+import { t, ui } from "@/lib/i18n";
 
 const linkColumns = [
   { href: "/directory", key: "directory" as const },
@@ -25,7 +25,7 @@ export default function Footer() {
         {/* Top: Logo + tagline */}
         <div className="mb-8">
           <Link href="/">
-            <span className="text-xl font-bold bg-gradient-to-r from-[#7B68EE] to-[#E879F9] bg-clip-text text-transparent">
+            <span className="text-2xl bg-gradient-to-r from-[#5EEDB8] via-[#F5C55A] to-[#EC4899] bg-clip-text text-transparent" style={{ fontFamily: "'This Appeal', sans-serif", letterSpacing: "0.25em" }}>
               PRISM
             </span>
           </Link>
@@ -42,7 +42,7 @@ export default function Footer() {
               href={link.href}
               className="text-sm text-[#1E1B3A] hover:text-[#7B68EE] transition-colors"
             >
-              {t(link.key, language)}
+              <span className="block">{t(link.key, language)}</span>
             </Link>
           ))}
         </div>

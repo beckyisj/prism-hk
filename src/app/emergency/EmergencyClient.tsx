@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { type EmergencyService } from "@/lib/emergency";
 import { useLanguage } from "@/lib/LanguageContext";
+import { isZh, t } from "@/lib/i18n";
 
 export default function EmergencyClient({ services }: { services: EmergencyService[] }) {
   const { language } = useLanguage();
@@ -25,13 +26,18 @@ export default function EmergencyClient({ services }: { services: EmergencyServi
       {/* Header */}
       <div className="bg-gradient-to-br from-[#DC2626] to-[#B91C1C] text-white rounded-2xl p-6 mb-8">
         <h1 className="text-2xl font-bold mb-1">
-          {language === "zh" ? "緊急服務目錄" : "Emergency Services Directory"}
-          {language === "both" && <span className="text-lg font-medium opacity-90 ml-2">緊急服務目錄</span>}
+          {language === "zh-Hans"
+            ? "紧急服务资料库"
+            : language === "zh"
+              ? "緊急服務目錄"
+              : "Emergency Services Directory"}
         </h1>
         <p className="text-sm opacity-80">
-          {language === "zh"
-            ? "如果你或身邊的人需要即時支援，請聯絡以下服務。"
-            : "If you or someone you know needs immediate support, contact these services."}
+          {language === "zh-Hans"
+            ? "如果你或身边的人需要即时支援，请联络以下服务。"
+            : language === "zh"
+              ? "如果你或身邊的人需要即時支援，請聯絡以下服務。"
+              : "If you or someone you know needs immediate support, contact these services."}
         </p>
       </div>
 
@@ -44,7 +50,7 @@ export default function EmergencyClient({ services }: { services: EmergencyServi
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={language === "zh" ? "搜尋緊急服務..." : "Search emergency services..."}
+          placeholder={language === "zh-Hans" ? "搜索紧急服务…" : language === "zh" ? "搜索緊急服務..." : "Search emergency services..."}
           className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E8E6F0] rounded-xl text-sm text-[#1E1B3A] placeholder-[#6B6890] focus:outline-none focus:border-[#7B68EE] focus:ring-1 focus:ring-[#7B68EE]"
         />
       </div>

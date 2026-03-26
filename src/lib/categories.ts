@@ -1,31 +1,37 @@
+import type { Language } from "./i18n";
+
 export const CATEGORIES = [
   {
-    id: "Business",
+    id: "Businesses",
     emoji: "\uD83C\uDFEA",
     gradient: "from-[#7B68EE] to-[#A78BFA]",
     en: "Businesses",
     zh: "商戶",
+    zhHans: "商户",
   },
   {
-    id: "Community",
+    id: "Community & Student Group",
     emoji: "\uD83E\uDD1D",
     gradient: "from-[#F472B6] to-[#E879F9]",
     en: "Community & Student Groups",
     zh: "社區及學生組織",
+    zhHans: "社区及学生组织",
   },
   {
-    id: "Healthcare",
-    emoji: "\u2694\uFE0F",
+    id: "Healthcare & Support",
+    emoji: "\u2764\uFE0F",
     gradient: "from-[#22C55E] to-[#16A34A]",
-    en: "Healthcare",
-    zh: "醫療服務",
+    en: "Healthcare & Support",
+    zh: "醫療及支援",
+    zhHans: "医疗及支援",
   },
   {
-    id: "NGO",
+    id: "NGOs",
     emoji: "\uD83C\uDF0E",
     gradient: "from-[#FFA726] to-[#FB923C]",
-    en: "NGOs & Advocacy",
+    en: "NGOs",
     zh: "非政府組織",
+    zhHans: "非政府组织",
   },
   {
     id: "Government",
@@ -33,6 +39,7 @@ export const CATEGORIES = [
     gradient: "from-[#38BDF8] to-[#0EA5E9]",
     en: "Government",
     zh: "政府",
+    zhHans: "政府机构",
   },
   {
     id: "Media",
@@ -40,6 +47,15 @@ export const CATEGORIES = [
     gradient: "from-[#A78BFA] to-[#7C3AED]",
     en: "Media",
     zh: "媒體",
+    zhHans: "媒体",
+  },
+  {
+    id: "Religious Organization",
+    emoji: "\uD83D\uDE4F",
+    gradient: "from-[#F59E0B] to-[#D97706]",
+    en: "Religious Organizations",
+    zh: "宗教組織",
+    zhHans: "宗教组织",
   },
 ] as const;
 
@@ -50,7 +66,15 @@ export function getCategoryInfo(categoryId: string) {
     gradient: "from-gray-400 to-gray-500",
     en: categoryId,
     zh: categoryId,
+    zhHans: categoryId,
   };
+}
+
+/** Get localized category name */
+export function getCategoryName(cat: typeof CATEGORIES[number], lang: Language): string {
+  if (lang === "zh-Hans") return cat.zhHans;
+  if (lang === "zh") return cat.zh;
+  return cat.en;
 }
 
 // Color palette for avatar backgrounds

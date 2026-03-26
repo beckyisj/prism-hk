@@ -4,9 +4,9 @@ import { useLanguage } from "@/lib/LanguageContext";
 import type { Language } from "@/lib/i18n";
 
 const options: { value: Language; label: string }[] = [
-  { value: "both", label: "EN/中" },
   { value: "en", label: "EN" },
-  { value: "zh", label: "中文" },
+  { value: "zh", label: "繁中" },
+  { value: "zh-Hans", label: "简中" },
 ];
 
 export default function LangToggle() {

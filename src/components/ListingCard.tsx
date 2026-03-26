@@ -19,19 +19,11 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   );
 
   const hasWebsite = !!listing.website;
-  const Wrapper = hasWebsite ? "a" : "div";
-  const wrapperProps = hasWebsite
-    ? {
-        href: listing.website!,
-        target: "_blank" as const,
-        rel: "noopener noreferrer",
-      }
-    : {};
 
   return (
-    <Wrapper
-      {...wrapperProps}
-      className="listing-card block bg-white border border-[#E8E6F0] rounded-xl p-4 transition-all duration-200 cursor-pointer"
+    <div
+      onClick={hasWebsite ? () => window.open(listing.website!, "_blank", "noopener,noreferrer") : undefined}
+      className={`listing-card block bg-white border border-[#E8E6F0] rounded-xl p-4 transition-all duration-200 ${hasWebsite ? "cursor-pointer" : ""}`}
     >
       <div className="flex gap-3">
         {/* Avatar */}
@@ -58,11 +50,11 @@ export default function ListingCard({ listing }: { listing: Listing }) {
               className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-gradient-to-r ${categoryInfo.gradient} text-white`}
             >
               {categoryInfo.emoji}{" "}
-              {language === "zh"
-                ? categoryInfo.zh
-                : language === "en"
-                  ? categoryInfo.en
-                  : `${categoryInfo.en} ${categoryInfo.zh}`}
+              {language === "zh-Hans"
+                ? (categoryInfo.zhHans || categoryInfo.zh)
+                : language === "zh"
+                  ? categoryInfo.zh
+                  : categoryInfo.en}
             </span>
             {listing.district_en && (
               <span className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F0EEFF] text-[#7B68EE]">
@@ -73,12 +65,30 @@ export default function ListingCard({ listing }: { listing: Listing }) {
                 )}
               </span>
             )}
+            {listing.price && (
+              <span className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                {listing.price}
+              </span>
+            )}
             {listing.verified && (
               <span className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700">
                 {t("verified", language)} ✓
               </span>
             )}
           </div>
+          {/* Tags */}
+          {listing.tags && listing.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {listing.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded bg-[#F5F4FA] text-[#6B6890]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Contact Icons */}
           <div className="flex items-center gap-2.5 mt-2.5">
@@ -178,7 +188,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
           </div>
         </div>
       </div>
-    </Wrapper>
+    </div>
   );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/LanguageContext";
-import { t, ui } from "@/lib/i18n";
+import { t, ui, isZh } from "@/lib/i18n";
 
 type HeroProps = {
   listingsCount: number;
@@ -31,7 +31,7 @@ export default function Hero({
     },
     {
       value: "24/7",
-      label: language === "zh" ? "全天候" : language === "both" ? "Online 線上" : "Online",
+      label: isZh(language) ? "全天候" : "Online",
     },
   ];
 
@@ -40,26 +40,17 @@ export default function Hero({
       <div className="relative z-10 max-w-5xl mx-auto px-4 text-center text-white">
         {/* Title */}
         <h1
-          className="text-5xl md:text-6xl font-extrabold tracking-tight mb-3"
-          style={{ textShadow: "0 2px 20px rgba(0,0,0,0.15)" }}
+          className="text-5xl md:text-7xl mb-3"
+          style={{ fontFamily: "'This Appeal', sans-serif", letterSpacing: "0.3em", paddingLeft: "0.3em", textShadow: "0 2px 20px rgba(0,0,0,0.15)" }}
         >
           PRISM
         </h1>
 
-        {/* Bilingual tagline in "both" mode */}
-        {language === "both" && (
-          <p className="text-lg md:text-xl text-white/80 mb-4 font-medium">
-            香港 LGBTQ+ 雙語目錄
-          </p>
-        )}
-
         {/* Subtitle */}
-        <p className="text-base md:text-lg text-white/90 max-w-2xl mx-auto mb-10 leading-relaxed">
-          {language === "zh"
-            ? ui.zh.heroSubtitle
-            : language === "en"
-              ? ui.en.heroSubtitle
-              : `${ui.en.heroSubtitle}\n${ui.zh.heroSubtitle}`}
+        <p className="text-base md:text-lg text-white/90 max-w-2xl mx-auto mb-10 leading-relaxed whitespace-pre-line">
+          {isZh(language)
+            ? (language === "zh-Hans" ? ui["zh-Hans"].heroSubtitle : ui.zh.heroSubtitle)
+            : ui.en.heroSubtitle}
         </p>
 
         {/* Stats row */}
