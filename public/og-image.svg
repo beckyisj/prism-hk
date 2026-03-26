@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3BC49A"/>
+      <stop offset="30%" stop-color="#5EBB6A"/>
+      <stop offset="50%" stop-color="#D4A030"/>
+      <stop offset="75%" stop-color="#C85070"/>
+      <stop offset="100%" stop-color="#C03878"/>
+    </linearGradient>
+    <linearGradient id="overlay" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="white" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="prism-left" x1="0.5" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5EEDB8"/>
+      <stop offset="60%" stop-color="#7CE88E"/>
+      <stop offset="100%" stop-color="#F5D55A"/>
+    </linearGradient>
+    <linearGradient id="prism-right" x1="0.3" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5C55A"/>
+      <stop offset="50%" stop-color="#F07090"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="prism-base" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#D4B0E8"/>
+      <stop offset="100%" stop-color="#F0B0A0"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.1)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="1200" fill="url(#bg)"/>
+  <rect width="1200" height="1200" fill="url(#overlay)"/>
+
+  <!-- === CROP ZONE: y=285 to y=915 (630px) === -->
+
+  <!-- Prism icon -->
+  <g transform="translate(600, 420)">
+    <ellipse cx="0" cy="90" rx="65" ry="15" fill="url(#shadow)"/>
+    <polygon points="0,-85 -72,72 0,30" fill="url(#prism-left)"/>
+    <polygon points="0,-85 72,72 0,30" fill="url(#prism-right)"/>
+    <polygon points="-72,72 72,72 0,82" fill="url(#prism-base)" opacity="0.45"/>
+  </g>
+
+  <!-- PRISM title -->
+  <text x="600" y="600" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="84" font-weight="700" letter-spacing="22" fill="white">PRISM</text>
+
+  <!-- Subtitle English -->
+  <text x="600" y="670" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="34" font-weight="500" fill="white" opacity="0.92">Hong Kong's LGBTQ+ Bilingual Directory</text>
+
+  <!-- Subtitle Chinese -->
+  <text x="600" y="720" text-anchor="middle" font-family="'PingFang HK', 'Noto Sans TC', 'Hiragino Sans GB', sans-serif" font-size="32" font-weight="400" fill="white" opacity="0.8">&#x9999;&#x6E2F; LGBTQ+ &#x96D9;&#x8A9E;&#x8CC7;&#x6599;&#x5EAB;</text>
+
+  <!-- Domain -->
+  <text x="600" y="810" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="26" font-weight="400" fill="white" opacity="0.6">prism.lgbt</text>
+</svg>
