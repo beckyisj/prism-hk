@@ -26,6 +26,7 @@ export default function DirectoryClient({
   const { language } = useLanguage();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
+  const initialTag = searchParams.get("tag") || "";
 
   const [filters, setFilters] = useState<Filters>({
     search: "",
@@ -36,6 +37,11 @@ export default function DirectoryClient({
 
   const filtered = useMemo(() => {
     return listings.filter((listing) => {
+      // Tag filter from URL param (e.g. ?tag=volunteering)
+      if (initialTag && !(listing.tags || []).includes(initialTag)) {
+        return false;
+      }
+
       // Category filter (contains match for multi-category listings)
       if (filters.category && !listing.category?.includes(filters.category)) {
         return false;
@@ -72,7 +78,7 @@ export default function DirectoryClient({
 
       return true;
     });
-  }, [listings, filters]);
+  }, [listings, filters, initialTag]);
 
   const categories = CATEGORIES.map((c) => c.id);
 

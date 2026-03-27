@@ -56,29 +56,14 @@ const CARDS = [
     btnZhHans: "提交文章",
     url: "https://forms.gle/MxWPavkHaGV25z8c6",
   },
-  {
-    emoji: "\u{1F4AC}",
-    gradient: "from-[#38BDF8] to-[#0EA5E9]",
-    btnColor: "bg-[#38BDF8] hover:bg-[#2AABEB]",
-    titleEn: "Submit Feedback",
-    titleZh: "提交意見",
-    titleZhHans: "提交意见",
-    descEn: "Have suggestions, corrections, or ideas to improve PRISM? We\u2019d love to hear from you.",
-    descZh: "有任何建議、更正或改善 PRISM 的想法？歡迎告訴我們。",
-    descZhHans: "有任何建议、更正或改善 PRISM 的想法？欢迎告诉我们。",
-    btnEn: "Submit Feedback",
-    btnZh: "提交意見",
-    btnZhHans: "提交意见",
-    url: "https://forms.gle/G2J1u9rupXvdydBs8",
-  },
 ];
 
 export default function GetInvolvedClient() {
   const { language } = useLanguage();
 
-  const pageDescEn = "Help grow Hong Kong\u2019s LGBTQ+ directory. Submit an organization, event, article, or share your feedback.";
-  const pageDescZh = "協助擴展香港 LGBTQ+ 資料庫。提交機構、活動、文章或分享你的意見。";
-  const pageDescZhHans = "协助扩展香港 LGBTQ+ 资料库。提交机构、活动、文章或分享你的意见。";
+  const pageDescEn = "Help grow Hong Kong\u2019s LGBTQ+ directory. Submit an organization, event, or article.";
+  const pageDescZh = "協助擴展香港 LGBTQ+ 資料庫。提交機構、活動或文章。";
+  const pageDescZhHans = "协助扩展香港 LGBTQ+ 资料库。提交机构、活动或文章。";
 
   return (
     <div className="max-w-3xl mx-auto px-6 pt-24 pb-20">
@@ -115,6 +100,62 @@ export default function GetInvolvedClient() {
             </div>
           </div>
         ))}
+
+        {/* Volunteer */}
+        <div className="bg-white rounded-2xl border border-[#E8E6F0] p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FFA726] to-[#FB923C] flex items-center justify-center text-xl shrink-0">
+              {"\u{1F91D}"}
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold mb-1">
+                {tx("Volunteer", "義工", "义工", language)}
+              </h2>
+              <p className="text-sm text-[#6B6890] mb-4">
+                {tx(
+                  "Please apply for volunteering opportunities at the following organizations.",
+                  "請到以下機構申請義工機會。",
+                  "请到以下机构申请义工机会。",
+                  language
+                )}
+              </p>
+              <a
+                href="/directory?tag=volunteering"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFA726] hover:bg-[#F59E0B] text-white rounded-xl font-semibold text-sm transition-colors"
+              >
+                {tx("View Organizations", "查看機構", "查看机构", language)} &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Donate */}
+        <div className="bg-white rounded-2xl border border-[#E8E6F0] p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#0EA5E9] flex items-center justify-center text-xl shrink-0">
+              {"\u{1F49C}"}
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold mb-1">
+                {tx("Donate", "捐款", "捐款", language)}
+              </h2>
+              <p className="text-sm text-[#6B6890] mb-4">
+                {tx(
+                  "Support organizations that accept donations.",
+                  "支持接受捐款的機構。",
+                  "支持接受捐款的机构。",
+                  language
+                )}
+              </p>
+              <a
+                href="/directory?tag=donations"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#38BDF8] hover:bg-[#2AABEB] text-white rounded-xl font-semibold text-sm transition-colors"
+              >
+                {tx("View Organizations", "查看機構", "查看机构", language)} &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
