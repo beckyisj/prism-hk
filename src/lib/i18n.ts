@@ -83,7 +83,7 @@ export const ui = {
     suggestResource: "Suggest a Resource",
 
     // Footer
-    footerTagline: "Hong Kong's LGBTQ+ bilingual directory.",
+    footerTagline: "Hong Kong's LGBTQ+ directory.",
     footerWavelength: "Find your wavelength.",
     footerBuiltWith: "Built with love for the community.",
   },
@@ -158,7 +158,7 @@ export const ui = {
     forAllies: "盟友與家人",
     suggestResource: "建議資源",
 
-    footerTagline: "香港 LGBTQ+ 雙語資料庫。",
+    footerTagline: "香港 LGBTQ+ 資料庫。",
     footerWavelength: "尋找你的頻率。",
     footerBuiltWith: "用愛為社區而建。",
   },
@@ -233,7 +233,7 @@ export const ui = {
     forAllies: "盟友与家人",
     suggestResource: "建议资源",
 
-    footerTagline: "香港 LGBTQ+ 双语资料库。",
+    footerTagline: "香港 LGBTQ+ 资料库。",
     footerWavelength: "寻找你的频率。",
     footerBuiltWith: "用爱为社区而建。",
   },
