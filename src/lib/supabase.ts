@@ -116,6 +116,11 @@ export async function getDistinctDistricts(): Promise<string[]> {
     .not("district_en", "is", null);
 
   if (!data) return [];
-  const districts = [...new Set(data.map((r) => r.district_en).filter(Boolean))] as string[];
-  return districts.sort();
+  // Split comma-separated districts into individual tags
+  const allDistricts = data
+    .map((r) => r.district_en)
+    .filter(Boolean)
+    .flatMap((d: string) => d.split(",").map((s: string) => s.trim()))
+    .filter(Boolean);
+  return [...new Set(allDistricts)].sort();
 }

@@ -16,19 +16,25 @@ function parseTags(value: string): string[] {
     .filter(Boolean);
 }
 
-// Map Blake's sheet categories to our standard categories
+// Map sheet categories to our standard category IDs (must match categories.ts)
 const CATEGORY_MAP: Record<string, string> = {
-  "health & support": "Healthcare",
-  "health": "Healthcare",
-  "healthcare": "Healthcare",
-  "community & student group": "Community",
-  "community": "Community",
-  "business": "Business",
-  "ngo": "NGO",
-  "non-profit & social enterprise": "NGO",
+  "health & support": "Healthcare & Support",
+  "health": "Healthcare & Support",
+  "healthcare": "Healthcare & Support",
+  "healthcare & support": "Healthcare & Support",
+  "community & student group": "Community & Student Group",
+  "community & student groups": "Community & Student Group",
+  "community": "Community & Student Group",
+  "business": "Businesses",
+  "businesses": "Businesses",
+  "ngo": "NGOs",
+  "ngos": "NGOs",
+  "non-profit & social enterprise": "NGOs",
   "government": "Government",
   "media": "Media",
-  "religious organisation": "Community",
+  "religious organisation": "Religious Organization",
+  "religious organization": "Religious Organization",
+  "religious organizations": "Religious Organization",
   "embassy / consulate": "Government",
 };
 
@@ -92,6 +98,9 @@ export async function syncFromSheets(sheetName?: string): Promise<SyncResult> {
     ? [{ name: sheetName, offset: 0 }]
     : SHEETS_TO_SYNC;
 
+  // Track all sheet_row_ids we upsert, so we can delete stale rows after
+  const allUpsertedIds: number[] = [];
+
   for (const sheet of sheetsToSync) {
     let rows: SheetRow[];
     try {
@@ -119,7 +128,7 @@ export async function syncFromSheets(sheetName?: string): Promise<SyncResult> {
 
         // Emergency Services: force category and tag
         if (sheet.name === "Emergency Services") {
-          transformed.category = "Healthcare";
+          transformed.category = "Healthcare & Support";
           transformed.status = "Published";
           if (!transformed.tags.includes("emergency-services")) {
             transformed.tags = [...transformed.tags, "emergency-services"];
@@ -134,6 +143,7 @@ export async function syncFromSheets(sheetName?: string): Promise<SyncResult> {
           errors.push({ row: sheet.offset + i + 2, error: error.message });
         } else {
           rows_upserted++;
+          allUpsertedIds.push(transformed.sheet_row_id);
         }
       } catch (err) {
         errors.push({
@@ -141,6 +151,25 @@ export async function syncFromSheets(sheetName?: string): Promise<SyncResult> {
           error: err instanceof Error ? err.message : String(err),
         });
       }
+    }
+  }
+
+  // Delete stale rows: listings in Supabase whose sheet_row_id no longer exists in any sheet
+  // Only do this on full sync (not single-sheet sync) to avoid accidentally deleting other sheets' rows
+  if (!sheetName && allUpsertedIds.length > 0) {
+    try {
+      const { error: deleteError, count } = await supabase
+        .from("listings")
+        .delete({ count: "exact" })
+        .not("sheet_row_id", "in", `(${allUpsertedIds.join(",")})`);
+
+      if (deleteError) {
+        errors.push({ row: 0, error: `Stale cleanup error: ${deleteError.message}` });
+      } else if (count && count > 0) {
+        console.log(`Cleaned up ${count} stale listings`);
+      }
+    } catch (err) {
+      errors.push({ row: 0, error: `Stale cleanup failed: ${err instanceof Error ? err.message : String(err)}` });
     }
   }
 

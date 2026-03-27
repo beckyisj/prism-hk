@@ -41,9 +41,14 @@ export default function DirectoryClient({
         return false;
       }
 
-      // District filter
-      if (filters.district && listing.district_en !== filters.district) {
-        return false;
+      // District filter (check if any of the listing's comma-separated districts match)
+      if (filters.district) {
+        const listingDistricts = listing.district_en
+          ?.split(",")
+          .map((d) => d.trim()) || [];
+        if (!listingDistricts.includes(filters.district)) {
+          return false;
+        }
       }
 
       // Search filter

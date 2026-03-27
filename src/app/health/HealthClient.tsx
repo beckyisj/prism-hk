@@ -24,7 +24,10 @@ export default function HealthClient({
   const filtered = useMemo(() => {
     return listings.filter((listing) => {
       if (filters.category && !listing.category?.includes(filters.category)) return false;
-      if (filters.district && listing.district_en !== filters.district) return false;
+      if (filters.district) {
+        const listingDistricts = listing.district_en?.split(",").map((d) => d.trim()) || [];
+        if (!listingDistricts.includes(filters.district)) return false;
+      }
       if (filters.search) {
         const q = filters.search.toLowerCase();
         const searchable = [
