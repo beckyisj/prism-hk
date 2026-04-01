@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { LanguageProvider } from "@/lib/LanguageContext";
+import { AccessibilityProvider } from "@/lib/AccessibilityContext";
 import Nav from "@/components/Nav";
 import LangToggle from "@/components/LangToggle";
+import AccessibilityBar from "@/components/AccessibilityBar";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
@@ -38,10 +40,13 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <LanguageProvider>
-          <Nav />
-          <LangToggle />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+          <AccessibilityProvider>
+            <Nav />
+            <LangToggle />
+            <AccessibilityBar />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+          </AccessibilityProvider>
         </LanguageProvider>
       </body>
     </html>

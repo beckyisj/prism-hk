@@ -26,7 +26,31 @@ body {
   font-family: var(--font-sans);
   background: var(--color-bg);
   color: var(--color-text);
+  transition: background-color 0.3s, color 0.3s;
 }
+
+/* Dark mode */
+.dark body,
+.dark {
+  --color-bg: #121020;
+  --color-card: #1E1B3A;
+  --color-text: #E8E6F0;
+  --color-muted: #A8A3C0;
+  --color-border: #2E2A4A;
+}
+
+.dark .bg-white { background-color: #1E1B3A !important; }
+.dark .bg-\[\#FAFAFE\] { background-color: #121020 !important; }
+.dark .text-\[\#1E1B3A\] { color: #E8E6F0 !important; }
+.dark .text-\[\#6B6890\] { color: #A8A3C0 !important; }
+.dark .border-\[\#E8E6F0\] { border-color: #2E2A4A !important; }
+.dark .bg-\[\#F5F4FA\] { background-color: #2E2A4A !important; }
+.dark .bg-\[\#F0EEFF\] { background-color: rgba(123, 104, 238, 0.15) !important; }
+.dark .bg-\[\#E8DFFF\]\/60 { background-color: rgba(123, 104, 238, 0.2) !important; }
+.dark .bg-gradient-to-br.from-\[\#F3F0FF\] { background: linear-gradient(to bottom right, #1E1B3A, #2E2A4A) !important; }
+.dark .listing-card:hover { box-shadow: 0 6px 20px rgba(123, 104, 238, 0.2); }
+.dark input, .dark select { background-color: #2E2A4A !important; color: #E8E6F0 !important; border-color: #3A3660 !important; }
+.dark .bg-white\/80 { background-color: rgba(30, 27, 58, 0.8) !important; }
 
 /* Gradient hero — matches PRISM logo colours, darkened for contrast */
 .hero-gradient {
