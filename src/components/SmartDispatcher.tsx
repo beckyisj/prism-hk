@@ -37,7 +37,6 @@ const USER_TYPES: UserType[] = [
 ];
 
 const SERVICE_TYPES: ServiceType[] = [
-  { value: "everything", en: "everything", zh: "全部", zhHans: "全部" },
   { value: "community", en: "community", zh: "社區", zhHans: "社区" },
   { value: "hangouts", en: "hangouts", zh: "聚會場所", zhHans: "聚会场所" },
   { value: "activities", en: "activities", zh: "活動", zhHans: "活动" },
@@ -50,7 +49,7 @@ const SERVICE_TYPES: ServiceType[] = [
 // Routing matrix updated to match Blake's streamlined tags (April 2026)
 const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
   support: {
-    everything: { path: "/directory", tags: ["sti-testing", "emergency"] },
+
     community: null,
     hangouts: null,
     activities: null,
@@ -58,7 +57,7 @@ const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
     jobs: null,
   },
   student: {
-    everything: { path: "/directory" },
+
     community: { path: "/directory", category: "Community & Student Group", tags: ["children-youth", "university"] },
     hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "fitness", "hobby", "family-friendly"] },
     activities: { path: "/events" },
@@ -66,7 +65,7 @@ const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
     jobs: null,
   },
   "new-to-hk": {
-    everything: { path: "/directory" },
+
     community: { path: "/directory", category: "Community & Student Group", tags: ["social", "english"] },
     hangouts: { path: "/directory", category: "Businesses", tags: ["bar", "cafe", "non-alcoholic", "fitness", "hobby"] },
     activities: { path: "/events" },
@@ -74,7 +73,7 @@ const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
     jobs: null,
   },
   professional: {
-    everything: { path: "/directory" },
+
     community: { path: "/directory", category: "Community & Student Group", tags: ["professional", "volunteering"] },
     hangouts: null,
     activities: { path: "/directory", tags: ["volunteering", "professional"] },
@@ -82,7 +81,7 @@ const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
     jobs: null,
   },
   curious: {
-    everything: { path: "/directory" },
+
     community: { path: "/directory", category: "Community & Student Group" },
     hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "fitness", "hobby", "family-friendly"] },
     activities: { path: "/directory", tags: ["education"] },
@@ -90,7 +89,7 @@ const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
     jobs: null,
   },
   party: {
-    everything: { path: "/directory" },
+
     community: { path: "/directory", category: "Community & Student Group", tags: ["social"] },
     hangouts: { path: "/directory", category: "Businesses", tags: ["bar", "party", "entertainment"] },
     activities: { path: "/events" },
@@ -98,7 +97,7 @@ const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
     jobs: null,
   },
   family: {
-    everything: { path: "/directory" },
+
     community: { path: "/directory", category: "Community & Student Group", tags: ["family-friendly", "pet-friendly"] },
     hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "fitness", "hobby", "family-friendly", "children-youth", "pet-friendly"] },
     activities: { path: "/directory", tags: ["family-friendly", "pet-friendly", "volunteering"] },
@@ -106,7 +105,7 @@ const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
     jobs: null,
   },
   exploring: {
-    everything: { path: "/directory" },
+
     community: { path: "/directory" },
     hangouts: { path: "/directory" },
     activities: { path: "/directory" },
@@ -119,7 +118,7 @@ export default function SmartDispatcher() {
   const { language } = useLanguage();
   const router = useRouter();
   const [userType, setUserType] = useState("exploring");
-  const [serviceType, setServiceType] = useState("everything");
+  const [serviceType, setServiceType] = useState("community");
 
   const lang = isZh(language) ? (language === "zh-Hans" ? "zhHans" : "zh") : "en";
 
@@ -127,7 +126,6 @@ export default function SmartDispatcher() {
   const availableServices = useMemo(() => {
     const matrix = ROUTE_MATRIX[userType] || {};
     return SERVICE_TYPES.filter((s) => {
-      if (s.value === "everything") return true;
       return matrix[s.value] !== null && matrix[s.value] !== undefined;
     });
   }, [userType]);
