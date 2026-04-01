@@ -14,6 +14,7 @@ type FilterBarProps = {
     district: string;
   }) => void;
   initialCategory?: string;
+  initialSearch?: string;
 };
 
 export default function FilterBar({
@@ -21,9 +22,10 @@ export default function FilterBar({
   districts,
   onFilter,
   initialCategory = "",
+  initialSearch = "",
 }: FilterBarProps) {
   const { language } = useLanguage();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [activeDistrict, setActiveDistrict] = useState("");
   const [showDistricts, setShowDistricts] = useState(false);

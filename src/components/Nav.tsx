@@ -154,17 +154,34 @@ export default function Nav() {
         {/* Search button */}
         <div className="flex items-center gap-2">
           {searchOpen ? (
-            <form onSubmit={handleSearch} className="flex items-center">
+            <form onSubmit={handleSearch} className="flex items-center gap-1">
               <input
                 ref={searchRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onBlur={() => { if (!searchQuery) setSearchOpen(false); }}
+                onKeyDown={(e) => { if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); } }}
                 placeholder={isZh(language) ? "搜索..." : "Search..."}
                 className="w-40 md:w-56 px-3 py-1.5 text-sm border border-[#E8E6F0] rounded-lg focus:outline-none focus:border-[#7B68EE] bg-white"
                 autoFocus
               />
+              <button
+                type="submit"
+                className="p-1.5 text-[#7B68EE] hover:bg-[#F0EEFF] rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                className="p-1.5 text-[#6B6890] hover:text-[#1E1B3A] rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </form>
           ) : (
             <button

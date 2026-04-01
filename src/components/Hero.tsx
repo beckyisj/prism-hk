@@ -47,7 +47,7 @@ export default function Hero({
                 key={stat.label}
                 className="bg-[#E8DFFF]/60 rounded-2xl px-6 py-5 text-center min-w-[120px]"
               >
-                <div className="text-3xl font-bold text-[#7B68EE]">
+                <div className="text-3xl font-bold text-[#7B68EE] tabular-nums">
                   {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
                 </div>
                 <div className="text-[9px] uppercase tracking-[0.15em] text-[#6B6890] font-semibold mt-1">

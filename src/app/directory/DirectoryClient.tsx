@@ -151,6 +151,7 @@ export default function DirectoryClient({
           districts={districts}
           onFilter={setFilters}
           initialCategory={initialCategory}
+          initialSearch={initialSearch}
         />
       </div>
 
