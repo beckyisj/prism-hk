@@ -90,7 +90,7 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
   const weekdays = isZh(language) ? WEEKDAYS_ZH : WEEKDAYS_EN;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pt-24 pb-20">
+    <div className="max-w-5xl mx-auto px-6 pt-32 pb-20">
       {/* Header + view toggle */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>

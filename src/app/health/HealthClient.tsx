@@ -66,7 +66,7 @@ export default function HealthClient({
   }, [listings, filters, activeTags, activePrice]);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pt-24 pb-20">
+    <div className="max-w-5xl mx-auto px-6 pt-32 pb-20">
       <h1 className="text-3xl font-bold mb-1">
         {t("health", language)}
       </h1>

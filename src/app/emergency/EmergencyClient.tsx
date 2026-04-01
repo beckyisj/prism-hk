@@ -26,7 +26,7 @@ export default function EmergencyClient({ listings }: { listings: Listing[] }) {
   }, [listings, search]);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pt-24 pb-20">
+    <div className="max-w-5xl mx-auto px-6 pt-32 pb-20">
       {/* Header */}
       <div className="bg-gradient-to-br from-[#DC2626] to-[#B91C1C] text-white rounded-2xl p-6 mb-8">
         <h1 className="text-2xl font-bold mb-1">

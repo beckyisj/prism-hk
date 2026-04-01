@@ -16,7 +16,7 @@ export default function ContactClient() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 pt-24 pb-20">
+    <div className="max-w-3xl mx-auto px-6 pt-32 pb-20">
       <h1 className="text-3xl font-bold mb-2">
         {isZh(language) ? "聯絡我們" : "Contact Us"}
       </h1>

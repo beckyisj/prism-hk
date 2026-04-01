@@ -66,7 +66,7 @@ export default function LearnClient() {
   const { language } = useLanguage();
 
   return (
-    <div className="max-w-3xl mx-auto px-6 pt-24 pb-20">
+    <div className="max-w-3xl mx-auto px-6 pt-32 pb-20">
       <h1 className="text-4xl font-bold mb-2">
         {t("learnTitle", language)}
       </h1>

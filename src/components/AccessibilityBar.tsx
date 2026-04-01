@@ -7,7 +7,7 @@ export default function AccessibilityBar() {
 
   return (
     <div
-      className="fixed top-[6.25rem] right-16 z-40 flex items-center bg-white dark:bg-[#1E1B3A] rounded-full shadow-md border border-[#E8E6F0] dark:border-[#3A3660] overflow-hidden"
+      className="fixed top-[7.5rem] right-4 z-40 flex items-center bg-white dark:bg-[#1E1B3A] rounded-full shadow-md border border-[#E8E6F0] dark:border-[#3A3660] overflow-hidden"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
       {/* Font size */}

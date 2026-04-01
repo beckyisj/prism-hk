@@ -111,7 +111,7 @@ export default function DirectoryClient({
   const categories = CATEGORIES.map((c) => c.id);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pt-24 pb-20">
+    <div className="max-w-5xl mx-auto px-6 pt-32 pb-20">
       <div className="flex items-end justify-between mb-1">
         <div>
           <h1 className="text-3xl font-bold">

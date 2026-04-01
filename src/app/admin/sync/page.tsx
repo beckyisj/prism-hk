@@ -113,7 +113,7 @@ export default function AdminSyncPage() {
   const currentLog = tab === "listings" ? listingLog : transLog;
 
   return (
-    <div className="max-w-2xl mx-auto px-6 pt-24 pb-20">
+    <div className="max-w-2xl mx-auto px-6 pt-32 pb-20">
       <h1 className="text-3xl font-bold mb-2">Sync Dashboard</h1>
       <p className="text-sm text-[#6B6890] mb-6">
         Keep the PRISM directory and translations up to date from the Google Sheet.
