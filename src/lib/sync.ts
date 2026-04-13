@@ -88,8 +88,6 @@ function transformRow(row: SheetRow, rowIndex: number) {
 // Sheets to sync — each gets a unique row ID offset to avoid collisions
 const SHEETS_TO_SYNC = [
   { name: "Directory", offset: 0 },
-  { name: "Testing Services", offset: 10000 },
-  { name: "Emergency Services", offset: 20000 },
 ];
 
 // Batch size for upserts (Supabase handles up to ~1000 rows per call)
@@ -136,15 +134,6 @@ export async function syncFromSheets(sheetName?: string): Promise<SyncResult> {
       if (!row.name_en) continue;
 
       const transformed = transformRow(row, sheet.offset + i + 2);
-
-      // Emergency Services: force category and tag
-      if (sheet.name === "Emergency Services") {
-        transformed.category = "Healthcare & Support";
-        transformed.status = "Published";
-        if (!transformed.tags.includes("emergency-services")) {
-          transformed.tags = [...transformed.tags, "emergency-services"];
-        }
-      }
 
       batch.push(transformed);
     }
