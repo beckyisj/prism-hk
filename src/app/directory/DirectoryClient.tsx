@@ -57,6 +57,7 @@ export default function DirectoryClient({
   const [activePrice, setActivePrice] = useState("");
   const [showTags, setShowTags] = useState(allInitialTags.length > 0);
   const [showPrices, setShowPrices] = useState(false);
+  const [tagMode, setTagMode] = useState<"and" | "or">(allInitialTags.length > 1 ? "or" : "and");
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
 
   function toggleTag(tag: string) {
@@ -67,11 +68,13 @@ export default function DirectoryClient({
 
   const filtered = useMemo(() => {
     return listings.filter((listing) => {
-      // Multi-select tag filter — AND logic (listing must have ALL selected tags)
+      // Multi-select tag filter — AND or OR logic
       if (activeTags.length > 0) {
         const listingTags = listing.tags || [];
-        if (!activeTags.every((t) => listingTags.includes(t))) {
-          return false;
+        if (tagMode === "or") {
+          if (!activeTags.some((t) => listingTags.includes(t))) return false;
+        } else {
+          if (!activeTags.every((t) => listingTags.includes(t))) return false;
         }
       }
 
@@ -183,12 +186,21 @@ export default function DirectoryClient({
             ? `${isZh(language) ? "標籤" : "Tags"} (${activeTags.length})`
             : isZh(language) ? "篩選標籤" : "Filter by Tags"}
           {activeTags.length > 0 && (
-            <span
-              onClick={(e) => { e.stopPropagation(); setActiveTags([]); }}
-              className="ml-1 text-xs bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 hover:bg-[#E0DDFF] cursor-pointer"
-            >
-              {isZh(language) ? "清除" : "Clear"}
-            </span>
+            <>
+              <span
+                onClick={(e) => { e.stopPropagation(); setTagMode(tagMode === "and" ? "or" : "and"); }}
+                className="ml-1 text-xs bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 hover:bg-[#E0DDFF] cursor-pointer"
+                title={tagMode === "and" ? "Showing listings with ALL tags" : "Showing listings with ANY tag"}
+              >
+                {tagMode === "and" ? "AND" : "OR"}
+              </span>
+              <span
+                onClick={(e) => { e.stopPropagation(); setActiveTags([]); }}
+                className="ml-1 text-xs bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 hover:bg-[#E0DDFF] cursor-pointer"
+              >
+                {isZh(language) ? "清除" : "Clear"}
+              </span>
+            </>
           )}
         </button>
         {showTags && (

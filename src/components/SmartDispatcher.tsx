@@ -37,80 +37,72 @@ const USER_TYPES: UserType[] = [
 ];
 
 const SERVICE_TYPES: ServiceType[] = [
+  { value: "support-svc", en: "support", zh: "支援", zhHans: "支援" },
   { value: "community", en: "community", zh: "社區", zhHans: "社区" },
   { value: "hangouts", en: "hangouts", zh: "聚會場所", zhHans: "聚会场所" },
   { value: "activities", en: "activities", zh: "活動", zhHans: "活动" },
   { value: "learning", en: "learning", zh: "學習資源", zhHans: "学习资源" },
-  { value: "jobs", en: "jobs", zh: "工作機會", zhHans: "工作机会" },
 ];
 
 // Routing matrix: [userType][serviceType] → route config
-// Based on the Google Sheet "User Type + Service Type" tab
-// Routing matrix updated to match Blake's streamlined tags (April 2026)
+// Based on the Google Sheet "User Type + Service Type" tab (April 2026)
+// Tags use OR operator — listings matching ANY tag will show
 const ROUTE_MATRIX: Record<string, Record<string, Route | null>> = {
   support: {
-
+    "support-svc": { path: "/directory", tags: ["emergency", "sti-testing"] },
     community: null,
     hangouts: null,
     activities: null,
     learning: { path: "/learn/resources" },
-    jobs: null,
   },
   student: {
-
-    community: { path: "/directory", category: "Community & Student Group", tags: ["children-youth", "university"] },
-    hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "fitness", "hobby", "family-friendly"] },
-    activities: { path: "/events" },
+    "support-svc": { path: "/directory", category: "Healthcare & Support", tags: ["university", "children-youth"] },
+    community: { path: "/directory", category: "Community & Student Group", tags: ["university", "children-youth"] },
+    hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "sports", "hobby", "family-friendly", "children-youth", "pet-friendly"] },
+    activities: { path: "/events", tags: ["non-alcoholic", "cafe", "sports", "hobby", "family-friendly", "children-youth", "volunteering", "pet-friendly"] },
     learning: { path: "/learn/resources" },
-    jobs: null,
   },
   "new-to-hk": {
-
-    community: { path: "/directory", category: "Community & Student Group", tags: ["social", "english"] },
-    hangouts: { path: "/directory", category: "Businesses", tags: ["bar", "cafe", "non-alcoholic", "fitness", "hobby"] },
-    activities: { path: "/events" },
+    "support-svc": { path: "/directory", category: "Healthcare & Support" },
+    community: { path: "/directory", category: "Community & Student Group", tags: ["social", "english", "multilingual"] },
+    hangouts: { path: "/directory", category: "Businesses", tags: ["bar", "cafe", "non-alcoholic", "sports", "hobby", "english", "multilingual"] },
+    activities: { path: "/events", tags: ["english", "multilingual"] },
     learning: { path: "/learn/resources" },
-    jobs: null,
   },
   professional: {
-
+    "support-svc": { path: "/directory", category: "Healthcare & Support", tags: ["legal-aid"] },
     community: { path: "/directory", category: "Community & Student Group", tags: ["professional", "volunteering"] },
     hangouts: null,
-    activities: { path: "/directory", tags: ["volunteering", "professional"] },
+    activities: { path: "/events", tags: ["professional"] },
     learning: { path: "/learn/resources" },
-    jobs: null,
   },
   curious: {
-
+    "support-svc": null,
     community: { path: "/directory", category: "Community & Student Group" },
-    hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "fitness", "hobby", "family-friendly"] },
-    activities: { path: "/directory", tags: ["education"] },
+    hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "sports", "hobby", "family-friendly", "children-youth", "pet-friendly"] },
+    activities: { path: "/events", tags: ["education"] },
     learning: { path: "/learn/resources" },
-    jobs: null,
   },
   party: {
-
+    "support-svc": { path: "/directory", category: "Healthcare & Support", tags: ["harm-reduction"] },
     community: { path: "/directory", category: "Community & Student Group", tags: ["social"] },
     hangouts: { path: "/directory", category: "Businesses", tags: ["bar", "party", "entertainment"] },
-    activities: { path: "/events" },
-    learning: { path: "/learn/resources" },
-    jobs: null,
+    activities: { path: "/events", tags: ["party", "entertainment"] },
+    learning: { path: "/learn/resources", tags: ["harm-reduction"] },
   },
   family: {
-
-    community: { path: "/directory", category: "Community & Student Group", tags: ["family-friendly", "pet-friendly"] },
-    hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "fitness", "hobby", "family-friendly", "children-youth", "pet-friendly"] },
-    activities: { path: "/directory", tags: ["family-friendly", "pet-friendly", "volunteering"] },
+    "support-svc": { path: "/directory", category: "Healthcare & Support", tags: ["children-youth", "family-planning"] },
+    community: { path: "/directory", category: "Community & Student Group", tags: ["university", "children-youth", "family-friendly", "pet-friendly"] },
+    hangouts: { path: "/directory", category: "Businesses", tags: ["cafe", "non-alcoholic", "sports", "hobby", "family-friendly", "children-youth", "pet-friendly"] },
+    activities: { path: "/events", tags: ["non-alcoholic", "cafe", "sports", "hobby", "family-friendly", "children-youth", "volunteering", "pet-friendly"] },
     learning: { path: "/learn/resources" },
-    jobs: null,
   },
   exploring: {
-
+    "support-svc": { path: "/directory" },
     community: { path: "/directory" },
     hangouts: { path: "/directory" },
-    activities: { path: "/directory" },
-    learning: { path: "/directory" },
-    jobs: { path: "/directory" },
+    activities: { path: "/events" },
+    learning: { path: "/learn/resources" },
   },
 };
 
@@ -133,7 +125,7 @@ export default function SmartDispatcher() {
   // Reset service type if current selection is unavailable
   const effectiveService = availableServices.find((s) => s.value === serviceType)
     ? serviceType
-    : "everything";
+    : availableServices[0]?.value || "community";
 
   const iAmLabel = isZh(language) ? "我是" : "I am";
   const lookingForLabel = language === "zh-Hans" ? "，想寻找" : language === "zh" ? "，想尋找" : " looking for ";
