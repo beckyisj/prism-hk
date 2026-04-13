@@ -5,8 +5,8 @@ import DirectoryClient from "./DirectoryClient";
 export const revalidate = 300;
 
 export const metadata = {
-  title: "Directory — PRISM HK 目錄",
-  description: "Browse LGBTQ+-friendly listings across Hong Kong. 瀏覽香港各區 LGBTQ+ 友善商戶。",
+  title: "Explore — PRISM HK 探索",
+  description: "Explore LGBTQ+-friendly spaces and support across Hong Kong. 探索香港各區 LGBTQ+ 友善空間及支援。",
 };
 
 export default async function DirectoryPage() {

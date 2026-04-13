@@ -31,10 +31,10 @@ export default function EmergencyClient({ listings }: { listings: Listing[] }) {
       <div className="bg-gradient-to-br from-[#DC2626] to-[#B91C1C] text-white rounded-2xl p-6 mb-8">
         <h1 className="text-2xl font-bold mb-1">
           {language === "zh-Hans"
-            ? "紧急服务资料库"
+            ? "紧急服务"
             : language === "zh"
-              ? "緊急服務目錄"
-              : "Emergency Services Directory"}
+              ? "緊急服務"
+              : "Emergency Services"}
         </h1>
         <p className="text-sm opacity-80">
           {language === "zh-Hans"

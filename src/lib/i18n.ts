@@ -4,7 +4,7 @@ export const ui = {
   en: {
     // Nav
     home: "Home",
-    directory: "Directory",
+    directory: "Explore",
     health: "Healthcare & Support",
     emergencyServices: "Emergency Services",
     events: "Events",
@@ -90,7 +90,7 @@ export const ui = {
   },
   zh: {
     home: "首頁",
-    directory: "資料庫",
+    directory: "探索",
     health: "醫療及支援",
     emergencyServices: "緊急支援",
     events: "活動",
@@ -166,7 +166,7 @@ export const ui = {
   },
   "zh-Hans": {
     home: "主页",
-    directory: "资料库",
+    directory: "探索",
     health: "医疗及支援",
     emergencyServices: "紧急支援",
     events: "活动",

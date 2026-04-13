@@ -12,6 +12,16 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { t, isZh } from "@/lib/i18n";
 import { translateTag } from "@/lib/tagTranslations";
 
+const TAG_GROUPS: { label: string; zh: string; zhHans: string; tags: string[] }[] = [
+  { label: "Identity", zh: "身份", zhHans: "身份", tags: ["men", "women", "transgender", "bisexual", "asexual-aromantic", "children-youth", "elderly", "family-friendly"] },
+  { label: "Type of Place", zh: "場所類型", zhHans: "场所类型", tags: ["bar", "cafe", "restaurant", "sauna", "beach", "clinic", "shelter", "university", "fitness", "sports"] },
+  { label: "Services & Support", zh: "服務與支援", zhHans: "服务与支援", tags: ["mental-health", "sexual-health", "sti-testing", "prep-provider", "legal-aid", "domestic-violence", "harm-reduction", "family-planning", "emergency", "sliding-scale-fees", "telehealth-available", "walk-in", "appointment-only"] },
+  { label: "Activities & Interests", zh: "活動與興趣", zhHans: "活动与兴趣", tags: ["arts", "drag", "entertainment", "party", "social", "hobby", "education", "volunteering"] },
+  { label: "Language", zh: "語言", zhHans: "语言", tags: ["cantonese", "english", "multilingual"] },
+  { label: "Organization Type", zh: "機構類型", zhHans: "机构类型", tags: ["lgbtq-led", "lgbtq-friendly", "advocacy", "professional", "religion", "donations"] },
+  { label: "Amenities", zh: "設施", zhHans: "设施", tags: ["pet-friendly", "non-alcoholic", "wheelchair-accessible"] },
+];
+
 type Filters = {
   search: string;
   category: string;
@@ -118,7 +128,7 @@ export default function DirectoryClient({
             {t("directory", language)}
           </h1>
           <p className="text-[#6B6890] text-sm mt-1">
-            {filtered.length} / {listings.length} {isZh(language) ? "香港 LGBTQ+ 友善機構" : language === "both" ? "LGBTQ+-friendly listings across Hong Kong 香港 LGBTQ+ 友善機構" : "LGBTQ+-friendly listings across Hong Kong"}
+            {filtered.length} / {listings.length} {isZh(language) ? "香港 LGBTQ+ 友善空間及支援" : "LGBTQ+-friendly spaces and support across Hong Kong"}
           </p>
         </div>
 
@@ -182,20 +192,58 @@ export default function DirectoryClient({
           )}
         </button>
         {showTags && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => toggleTag(tag)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
-                  activeTags.includes(tag)
-                    ? "bg-[#7B68EE] text-white border-[#7B68EE]"
-                    : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA] hover:text-[#7B68EE]"
-                }`}
-              >
-                {translateTag(tag, language)}
-              </button>
-            ))}
+          <div className="mt-2 space-y-3">
+            {TAG_GROUPS.map((group) => {
+              const availableTags = group.tags.filter((t) => tags.includes(t));
+              if (availableTags.length === 0) return null;
+              const groupLabel = language === "zh-Hans" ? group.zhHans : language === "zh" ? group.zh : group.label;
+              return (
+                <div key={group.label}>
+                  <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-1.5">{groupLabel}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {availableTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => toggleTag(tag)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                          activeTags.includes(tag)
+                            ? "bg-[#7B68EE] text-white border-[#7B68EE]"
+                            : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA] hover:text-[#7B68EE]"
+                        }`}
+                      >
+                        {translateTag(tag, language)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {/* Ungrouped tags */}
+            {(() => {
+              const groupedTags = TAG_GROUPS.flatMap((g) => g.tags);
+              const ungrouped = tags.filter((t) => !groupedTags.includes(t));
+              if (ungrouped.length === 0) return null;
+              return (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-1.5">{isZh(language) ? "其他" : "Other"}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {ungrouped.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => toggleTag(tag)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                          activeTags.includes(tag)
+                            ? "bg-[#7B68EE] text-white border-[#7B68EE]"
+                            : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA] hover:text-[#7B68EE]"
+                        }`}
+                      >
+                        {translateTag(tag, language)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
