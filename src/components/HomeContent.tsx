@@ -108,6 +108,21 @@ export default function HomeContent({
           </p>
         </div>
 
+        {/* Photo row */}
+        <div className="flex justify-center gap-3 md:gap-4 mb-10">
+          {["/hero-2.png", "/hero-3.png", "/hero-4.png", "/hero-6.png"].map((src, i) => (
+            <div key={i} className="w-[140px] md:w-[180px] h-[100px] md:h-[130px] rounded-2xl overflow-hidden shadow-sm outline outline-1 outline-black/5">
+              <img src={src} alt="" className="w-full h-full object-cover" />
+            </div>
+          ))}
+        </div>
+
+        <p className="text-center text-sm text-[#6B6890] mb-6">
+          {isZh(language)
+            ? "全港十八區的 LGBTQ+ 資源與支援。"
+            : "LGBTQ+ resources and support in every corner of Hong Kong."}
+        </p>
+
         {/* Stats row */}
         <div className="flex justify-center gap-8 md:gap-16">
           {[
@@ -148,7 +163,9 @@ export default function HomeContent({
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8E6F0] py-14 text-center">
-            <div className="text-4xl mb-3">🔍</div>
+            <svg className="w-16 h-16 mx-auto mb-4 text-[#E8E6F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
             <p className="text-[#6B6890] text-sm">
               {isZh(language) ? "暫無精選機構，請稍後再來！" : "No featured listings yet. Check back soon!"}
             </p>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { isZh } from "@/lib/i18n";
 
@@ -10,33 +9,8 @@ type HeroProps = {
   districtsCount: number;
 };
 
-const CYCLING_TAGS = [
-  { en: "lgbtq-friendly", zh: "LGBTQ+ 友善" },
-  { en: "community", zh: "社區" },
-  { en: "healthcare", zh: "醫療" },
-  { en: "social", zh: "社交" },
-  { en: "professional", zh: "專業" },
-  { en: "education", zh: "教育" },
-  { en: "entertainment", zh: "娛樂" },
-  { en: "mental-health", zh: "精神健康" },
-  { en: "arts", zh: "藝術" },
-  { en: "volunteering", zh: "義工" },
-];
-
-export default function Hero({
-  listingsCount,
-  categoriesCount,
-  districtsCount,
-}: HeroProps) {
+export default function Hero({}: HeroProps) {
   const { language } = useLanguage();
-  const [tagIndex, setTagIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTagIndex((prev) => (prev + 1) % CYCLING_TAGS.length);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <section className="relative overflow-hidden pt-28 pb-8 bg-[#FAFAFE]">
@@ -47,27 +21,43 @@ export default function Hero({
             <p className="text-sm font-semibold text-[#7B68EE] tracking-wide mb-2">
               Find Your Wavelength
             </p>
-            <h1 className="text-3xl md:text-4xl font-bold leading-tight text-[#1E1B3A]">
+            <h1 className="text-3xl md:text-[2.5rem] font-bold leading-[1.2] text-[#1E1B3A] whitespace-pre-line">
               {isZh(language)
-                ? "探索香港 LGBTQ+ 資源與活動"
-                : "Explore LGBTQ+ resources and events"}
+                ? "探索香港 LGBTQ+\n資源與活動。"
+                : "Explore LGBTQ+\nresources and events."}
             </h1>
           </div>
 
-          {/* Right — cycling tag pills */}
-          <div className="flex-shrink-0 hidden md:flex items-center gap-2 pt-8 flex-wrap max-w-[300px]">
-            {CYCLING_TAGS.slice(0, 8).map((tag, i) => (
-              <span
-                key={tag.en}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-700 ${
-                  i === tagIndex % 8
-                    ? "bg-[#7B68EE] text-white border-[#7B68EE] shadow-md shadow-[#7B68EE]/20"
-                    : "bg-white text-[#6B6890] border-[#E8E6F0]"
-                }`}
-              >
-                {isZh(language) ? tag.zh : tag.en}
-              </span>
-            ))}
+          {/* Right — photo collage with floating bubbles */}
+          <div className="flex-shrink-0 hidden md:block relative w-[340px] h-[260px]">
+            {/* PRISM peace badge */}
+            <div className="absolute -top-2 left-[90px] z-10 w-[60px] h-[60px] bg-white rounded-full shadow-md flex items-center justify-center border-2 border-[#1E1B3A]/10">
+              <span className="text-2xl">☮️</span>
+            </div>
+
+            {/* Main photo (flags — top right) */}
+            <div className="absolute top-[30px] right-0 w-[210px] h-[170px] rounded-2xl overflow-hidden shadow-lg outline outline-1 outline-black/5">
+              <img src="/hero-5.png" alt="" className="w-full h-full object-cover" />
+            </div>
+
+            {/* Secondary photo (pride arm — bottom left) */}
+            <div className="absolute bottom-0 left-0 w-[160px] h-[140px] rounded-2xl overflow-hidden shadow-lg outline outline-1 outline-black/5">
+              <img src="/hero-1.png" alt="" className="w-full h-full object-cover" />
+            </div>
+
+            {/* Floating category bubbles */}
+            <div className="absolute top-[50px] left-0 bg-white rounded-full pl-2 pr-3 py-1.5 flex items-center gap-1.5 shadow-md border border-[#E8E6F0]">
+              <span className="w-5 h-5 rounded bg-amber-100 flex items-center justify-center text-[10px]">🏥</span>
+              <span className="text-[11px] font-medium text-[#1E1B3A]">{isZh(language) ? "醫療及支援" : "Healthcare & Support"}</span>
+            </div>
+            <div className="absolute top-[120px] right-[-12px] bg-white rounded-full pl-2 pr-3 py-1.5 flex items-center gap-1.5 shadow-md border border-[#E8E6F0]">
+              <span className="w-5 h-5 rounded bg-pink-100 flex items-center justify-center text-[10px]">💜</span>
+              <span className="text-[11px] font-medium text-[#1E1B3A]">{isZh(language) ? "商戶" : "Businesses"}</span>
+            </div>
+            <div className="absolute bottom-[15px] left-[80px] bg-white rounded-full pl-2 pr-3 py-1.5 flex items-center gap-1.5 shadow-md border border-[#E8E6F0]">
+              <span className="w-5 h-5 rounded bg-blue-100 flex items-center justify-center text-[10px]">🌐</span>
+              <span className="text-[11px] font-medium text-[#1E1B3A]">{isZh(language) ? "社區及NGO" : "Community & NGOs"}</span>
+            </div>
           </div>
         </div>
       </div>

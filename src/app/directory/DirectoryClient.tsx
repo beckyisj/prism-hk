@@ -126,7 +126,7 @@ export default function DirectoryClient({
             <button
               key={d}
               onClick={() => { setDistrict(district === d ? "" : d); setPage(1); }}
-              className={`px-2 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+              className={`px-2 py-1 rounded-lg text-xs font-medium border transition-colors ${
                 district === d
                   ? "bg-[#7B68EE] text-white border-[#7B68EE]"
                   : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
@@ -154,7 +154,7 @@ export default function DirectoryClient({
               <button
                 key={p}
                 onClick={() => { setActivePrice(activePrice === p ? "" : p); setPage(1); }}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
                   activePrice === p
                     ? "bg-amber-500 text-white border-amber-500"
                     : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-amber-300"
@@ -200,7 +200,7 @@ export default function DirectoryClient({
                     <button
                       key={tag}
                       onClick={() => toggleTag(tag)}
-                      className={`px-2 py-0.5 rounded text-[11px] font-medium border transition-colors ${
+                      className={`px-2 py-0.5 rounded text-xs font-medium border transition-colors ${
                         activeTags.includes(tag)
                           ? "bg-[#7B68EE] text-white border-[#7B68EE]"
                           : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
@@ -313,7 +313,9 @@ export default function DirectoryClient({
             </div>
           ) : (
             <div className="bg-white rounded-2xl border border-[#E8E6F0] py-16 text-center">
-              <div className="text-3xl mb-3">🔍</div>
+              <svg className="w-14 h-14 mx-auto mb-3 text-[#E8E6F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
               <p className="text-[#6B6890] text-sm">
                 {isZh(language) ? "找不到符合條件的機構。" : "No listings found matching your filters."}
               </p>
