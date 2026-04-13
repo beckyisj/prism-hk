@@ -139,6 +139,51 @@ export default function LearnClient() {
           </div>
         </section>
 
+        {/* How does this work? — PRISM Pledge */}
+        <section>
+          <h2 className="text-xl font-bold mb-3">
+            {tx("How does this work?", "這是如何運作的？", "这是如何运作的？", language)}
+          </h2>
+          <p className="text-[#1E1B3A] leading-relaxed text-sm">
+            {tx(
+              "PRISM lists partner organizations and events sourced from those led by or catering to LGBTQ+ community members. Initial listings, including government entities and emergency listings (which may be exempt from signing), have not signed the PRISM Pledge for practical reasons but will have 60 days after PRISM's official launch to align where applicable. Going forward, new additions will sign the Pledge before listing, ensuring all partners affirm:",
+              "PRISM 列出由 LGBTQ+ 社群成員主導或服務社群的合作機構和活動。初始上架的機構（包括政府機構和緊急服務，它們可能獲豁免簽署）因實際原因尚未簽署 PRISM 承諾，但將在 PRISM 正式推出後 60 天內按適用情況達成一致。往後，新加入的機構將在上架前簽署承諾，確認所有合作夥伴肯定以下原則：",
+              "PRISM 列出由 LGBTQ+ 社群成员主导或服务社群的合作机构和活动。初始上架的机构（包括政府机构和紧急服务，它们可能获豁免签署）因实际原因尚未签署 PRISM 承诺，但将在 PRISM 正式推出后 60 天内按适用情况达成一致。往后，新加入的机构将在上架前签署承诺，确认所有合作伙伴肯定以下原则：",
+              language
+            )}
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-[#1E1B3A]">
+            <li className="flex gap-2">
+              <span className="shrink-0">•</span>
+              {tx("Leadership that includes/supports LGBTQ+ individuals", "管理層包括/支持 LGBTQ+ 人士", "管理层包括/支持 LGBTQ+ 人士", language)}
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">•</span>
+              {tx("Openness to hiring them without discrimination", "公開招聘，不歧視 LGBTQ+ 求職者", "公开招聘，不歧视 LGBTQ+ 求职者", language)}
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">•</span>
+              {tx("Equal treatment of LGBTQ+ people and customers", "平等對待 LGBTQ+ 人士和顧客", "平等对待 LGBTQ+ 人士和顾客", language)}
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">•</span>
+              {tx("Transgender individuals' right to use gender-aligned facilities", "跨性別人士使用與其性別認同一致的設施的權利", "跨性别人士使用与其性别认同一致的设施的权利", language)}
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">•</span>
+              {tx("Equivalent benefits like parental leave for same-sex marriages", "同性婚姻享有同等福利（如育嬰假）", "同性婚姻享有同等福利（如育婴假）", language)}
+            </li>
+          </ul>
+          <p className="mt-4 text-sm text-[#6B6890] leading-relaxed">
+            {tx(
+              "We encourage organizations to submit their Equal Opportunity Policy, Code of Conduct or similar documents. We may delist partners at our discretion based on credible complaints to protect the community. This fosters authentic, lasting collaborations.",
+              "我們鼓勵機構提交其平等機會政策、行為準則或類似文件。我們可能根據可信投訴酌情將合作夥伴除名，以保護社區。這有助促進真實、持久的合作關係。",
+              "我们鼓励机构提交其平等机会政策、行为准则或类似文件。我们可能根据可信投诉酌情将合作伙伴除名，以保护社区。这有助促进真实、持久的合作关系。",
+              language
+            )}
+          </p>
+        </section>
+
         {/* Meet Our Team */}
         <section>
           <h2 className="text-xl font-bold mb-4">
