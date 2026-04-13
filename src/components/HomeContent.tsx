@@ -81,10 +81,8 @@ export default function HomeContent({
                 href={`/directory?category=${cat.id}`}
                 className="flex flex-col items-center gap-2 group"
               >
-                <div
-                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center text-2xl shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all`}
-                >
-                  {cat.emoji}
+                <div className="w-14 h-14 rounded-2xl bg-[#F5F4FA] flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
+                  <img src={cat.icon} alt="" className="w-7 h-7 object-contain" />
                 </div>
                 <span className="text-xs font-medium text-[#6B6890] group-hover:text-[#7B68EE] transition-colors text-center max-w-[80px]">
                   {name}
@@ -163,9 +161,7 @@ export default function HomeContent({
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8E6F0] py-14 text-center">
-            <svg className="w-16 h-16 mx-auto mb-4 text-[#E8E6F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
+            <img src="/empty-search.png" alt="" className="w-20 h-20 mx-auto mb-4 object-contain" />
             <p className="text-[#6B6890] text-sm">
               {isZh(language) ? "暫無精選機構，請稍後再來！" : "No featured listings yet. Check back soon!"}
             </p>

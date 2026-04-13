@@ -275,7 +275,7 @@ export default function DirectoryClient({
                   category === cat.id ? "bg-[#7B68EE] text-white" : "bg-white text-[#6B6890] border border-[#E8E6F0] hover:border-[#A78BFA]"
                 }`}
               >
-                {cat.emoji} {getCategoryName(cat, language)}
+                <img src={cat.icon} alt="" className="w-4 h-4 object-contain" /> {getCategoryName(cat, language)}
               </button>
             ))}
           </div>

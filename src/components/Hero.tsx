@@ -28,36 +28,9 @@ export default function Hero({}: HeroProps) {
             </h1>
           </div>
 
-          {/* Right — photo collage with floating bubbles */}
-          <div className="flex-shrink-0 hidden md:block relative w-[340px] h-[260px]">
-            {/* PRISM peace badge */}
-            <div className="absolute -top-2 left-[90px] z-10 w-[60px] h-[60px] bg-white rounded-full shadow-md flex items-center justify-center border-2 border-[#1E1B3A]/10">
-              <span className="text-2xl">☮️</span>
-            </div>
-
-            {/* Main photo (flags — top right) */}
-            <div className="absolute top-[30px] right-0 w-[210px] h-[170px] rounded-2xl overflow-hidden shadow-lg outline outline-1 outline-black/5">
-              <img src="/hero-5.png" alt="" className="w-full h-full object-cover" />
-            </div>
-
-            {/* Secondary photo (pride arm — bottom left) */}
-            <div className="absolute bottom-0 left-0 w-[160px] h-[140px] rounded-2xl overflow-hidden shadow-lg outline outline-1 outline-black/5">
-              <img src="/hero-1.png" alt="" className="w-full h-full object-cover" />
-            </div>
-
-            {/* Floating category bubbles */}
-            <div className="absolute top-[50px] left-0 bg-white rounded-full pl-2 pr-3 py-1.5 flex items-center gap-1.5 shadow-md border border-[#E8E6F0]">
-              <span className="w-5 h-5 rounded bg-amber-100 flex items-center justify-center text-[10px]">🏥</span>
-              <span className="text-[11px] font-medium text-[#1E1B3A]">{isZh(language) ? "醫療及支援" : "Healthcare & Support"}</span>
-            </div>
-            <div className="absolute top-[120px] right-[-12px] bg-white rounded-full pl-2 pr-3 py-1.5 flex items-center gap-1.5 shadow-md border border-[#E8E6F0]">
-              <span className="w-5 h-5 rounded bg-pink-100 flex items-center justify-center text-[10px]">💜</span>
-              <span className="text-[11px] font-medium text-[#1E1B3A]">{isZh(language) ? "商戶" : "Businesses"}</span>
-            </div>
-            <div className="absolute bottom-[15px] left-[80px] bg-white rounded-full pl-2 pr-3 py-1.5 flex items-center gap-1.5 shadow-md border border-[#E8E6F0]">
-              <span className="w-5 h-5 rounded bg-blue-100 flex items-center justify-center text-[10px]">🌐</span>
-              <span className="text-[11px] font-medium text-[#1E1B3A]">{isZh(language) ? "社區及NGO" : "Community & NGOs"}</span>
-            </div>
+          {/* Right — photo collage (exported from Figma) */}
+          <div className="flex-shrink-0 hidden md:block">
+            <img src="/hero-collage.png" alt="" className="w-[340px] h-auto object-contain" />
           </div>
         </div>
       </div>
