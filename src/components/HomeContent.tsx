@@ -79,9 +79,9 @@ export default function HomeContent({
               <a
                 key={cat.id}
                 href={`/directory?category=${cat.id}`}
-                className="flex flex-col items-center gap-2 group"
+                className="flex flex-col items-center gap-2 group active:scale-[0.98]"
               >
-                <div className="w-14 h-14 rounded-2xl bg-[#F5F4FA] flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
+                <div className="w-14 h-14 rounded-2xl bg-[#F5F4FA] flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-[transform,box-shadow]">
                   <img src={cat.icon} alt="" className="w-7 h-7 object-contain" />
                 </div>
                 <span className="text-xs font-medium text-[#6B6890] group-hover:text-[#7B68EE] transition-colors text-center max-w-[80px]">
@@ -195,7 +195,7 @@ export default function HomeContent({
                 <div
                   key={i}
                   onClick={() => setSelectedEvent(event)}
-                  className="bg-white border border-[#E8E6F0] rounded-2xl p-5 hover:border-[#A78BFA] hover:shadow-md transition-all cursor-pointer"
+                  className="bg-white border border-[#E8E6F0] rounded-2xl p-5 hover:border-[#A78BFA] hover:shadow-md transition-[border-color,box-shadow] cursor-pointer active:scale-[0.98]"
                 >
                   <div className="flex items-start gap-4">
                     {eventDate && (
@@ -231,7 +231,7 @@ export default function HomeContent({
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <Link
                 href="/events"
-                className="px-5 py-2.5 bg-white border border-[#E8E6F0] text-[#7B68EE] rounded-full font-semibold text-sm hover:border-[#A78BFA] hover:shadow-md transition-all"
+                className="px-5 py-2.5 bg-white border border-[#E8E6F0] text-[#7B68EE] rounded-full font-semibold text-sm hover:border-[#A78BFA] hover:shadow-md transition-[border-color,box-shadow]"
               >
                 {isZh(language) ? "查看所有活動" : "View all events"} →
               </Link>
@@ -239,7 +239,7 @@ export default function HomeContent({
                 href="https://forms.gle/XyjEMGrbT7baWZen7"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-2.5 bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white rounded-full font-semibold text-sm hover:shadow-lg transition-all"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white rounded-full font-semibold text-sm hover:shadow-lg transition-[box-shadow]"
               >
                 {isZh(language) ? "提交活動" : "Submit an Event"} →
               </a>
@@ -269,7 +269,7 @@ export default function HomeContent({
                   href={org.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-white/80 backdrop-blur rounded-xl text-sm font-medium text-[#7B68EE] hover:bg-white hover:shadow-md transition-all"
+                  className="px-4 py-2 bg-white/80 backdrop-blur rounded-xl text-sm font-medium text-[#7B68EE] hover:bg-white hover:shadow-md transition-[background-color,box-shadow]"
                 >
                   {org.name} →
                 </a>

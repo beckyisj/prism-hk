@@ -32,7 +32,7 @@ export default function ListingCard({ listing, onSelect }: { listing: Listing; o
           <img
             src={listing.logo}
             alt={listing.name_en}
-            className="w-12 h-12 min-w-[48px] rounded-xl object-cover bg-[#F5F4FA]"
+            className="w-12 h-12 min-w-[48px] rounded-xl object-cover bg-[#F5F4FA] outline outline-1 outline-black/5"
             onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextElementSibling?.classList.remove("hidden"); }}
           />
         ) : null}

@@ -273,7 +273,7 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
           href="https://forms.gle/XyjEMGrbT7baWZen7"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white rounded-full font-semibold text-sm hover:shadow-lg transition-all"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white rounded-full font-semibold text-sm hover:shadow-lg transition-[box-shadow]"
         >
           {isZh(language) ? "提交活動" : "Submit an Event"} →
         </a>
@@ -296,7 +296,7 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
               href={org.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 p-4 bg-white rounded-xl border border-[#E8E6F0] hover:border-[#A78BFA] hover:shadow-md transition-all"
+              className="flex items-center gap-3 p-4 bg-white rounded-xl border border-[#E8E6F0] hover:border-[#A78BFA] hover:shadow-md transition-[border-color,box-shadow] active:scale-[0.98]"
             >
               <span className="text-2xl">{org.emoji}</span>
               <div>
@@ -330,7 +330,7 @@ function EventCard({ event, language, compact, onClick }: { event: PrismEvent; l
   return (
     <div
       onClick={onClick}
-      className={`bg-white border border-[#E8E6F0] rounded-2xl ${compact ? "p-4" : "p-6"} hover:border-[#A78BFA] hover:shadow-md transition-all cursor-pointer`}
+      className={`bg-white border border-[#E8E6F0] rounded-2xl ${compact ? "p-4" : "p-6"} hover:border-[#A78BFA] hover:shadow-md transition-[border-color,box-shadow] cursor-pointer active:scale-[0.98]`}
     >
       <div className="flex flex-col md:flex-row md:items-start gap-4">
         {/* Date badge */}
