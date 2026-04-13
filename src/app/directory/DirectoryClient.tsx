@@ -3,14 +3,13 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { type Listing } from "@/lib/supabase";
-import FilterBar from "@/components/FilterBar";
-import ListingGrid from "@/components/ListingGrid";
-import ListingList from "@/components/ListingList";
+import ListingCard from "@/components/ListingCard";
 import ListingPanel from "@/components/ListingPanel";
-import { CATEGORIES } from "@/lib/categories";
+import { CATEGORIES, getCategoryName } from "@/lib/categories";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, isZh } from "@/lib/i18n";
 import { translateTag } from "@/lib/tagTranslations";
+import { translateDistrict } from "@/lib/districtTranslations";
 
 const TAG_GROUPS: { label: string; zh: string; zhHans: string; tags: string[] }[] = [
   { label: "Identity", zh: "身份", zhHans: "身份", tags: ["men", "women", "transgender", "bisexual", "asexual-aromantic", "children-youth", "elderly", "family-friendly"] },
@@ -22,11 +21,7 @@ const TAG_GROUPS: { label: string; zh: string; zhHans: string; tags: string[] }[
   { label: "Amenities", zh: "設施", zhHans: "设施", tags: ["pet-friendly", "non-alcoholic", "wheelchair-accessible"] },
 ];
 
-type Filters = {
-  search: string;
-  category: string;
-  district: string;
-};
+const ITEMS_PER_PAGE = 30;
 
 export default function DirectoryClient({
   listings,
@@ -47,28 +42,34 @@ export default function DirectoryClient({
   const allInitialTags = initialTag ? [initialTag] : initialTags;
   const initialSearch = searchParams.get("search") || "";
 
-  const [filters, setFilters] = useState<Filters>({
-    search: initialSearch,
-    category: initialCategory,
-    district: "",
-  });
-  const [view, setView] = useState<"grid" | "list">("grid");
+  const [search, setSearch] = useState(initialSearch);
+  const [category, setCategory] = useState(initialCategory);
+  const [district, setDistrict] = useState("");
   const [activeTags, setActiveTags] = useState<string[]>(allInitialTags);
   const [activePrice, setActivePrice] = useState("");
-  const [showTags, setShowTags] = useState(allInitialTags.length > 0);
-  const [showPrices, setShowPrices] = useState(false);
   const [tagMode, setTagMode] = useState<"and" | "or">(allInitialTags.length > 1 ? "or" : "and");
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const [page, setPage] = useState(1);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   function toggleTag(tag: string) {
     setActiveTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+    setPage(1);
+  }
+
+  function resetFilters() {
+    setSearch("");
+    setCategory("");
+    setDistrict("");
+    setActiveTags([]);
+    setActivePrice("");
+    setPage(1);
   }
 
   const filtered = useMemo(() => {
     return listings.filter((listing) => {
-      // Multi-select tag filter — AND or OR logic
       if (activeTags.length > 0) {
         const listingTags = listing.tags || [];
         if (tagMode === "or") {
@@ -77,250 +78,301 @@ export default function DirectoryClient({
           if (!activeTags.every((t) => listingTags.includes(t))) return false;
         }
       }
-
-      // Price filter
-      if (activePrice) {
-        if (listing.price !== activePrice) return false;
+      if (activePrice && listing.price !== activePrice) return false;
+      if (category && !listing.category?.includes(category)) return false;
+      if (district) {
+        const listingDistricts = listing.district_en?.split(",").map((d) => d.trim()) || [];
+        if (!listingDistricts.includes(district)) return false;
       }
-
-      // Category filter
-      if (filters.category && !listing.category?.includes(filters.category)) {
-        return false;
+      if (search) {
+        const q = search.toLowerCase();
+        const searchable = [listing.name_en, listing.name_zh, listing.description_en, listing.description_zh, listing.district_en, listing.district_zh, listing.category, ...(listing.tags || [])].filter(Boolean).join(" ").toLowerCase();
+        if (!searchable.includes(q)) return false;
       }
-
-      // District filter
-      if (filters.district) {
-        const listingDistricts = listing.district_en
-          ?.split(",")
-          .map((d) => d.trim()) || [];
-        if (!listingDistricts.includes(filters.district)) {
-          return false;
-        }
-      }
-
-      // Search filter
-      if (filters.search) {
-        const q = filters.search.toLowerCase();
-        const searchable = [
-          listing.name_en,
-          listing.name_zh,
-          listing.description_en,
-          listing.description_zh,
-          listing.district_en,
-          listing.district_zh,
-          listing.category,
-          ...(listing.tags || []),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        return searchable.includes(q);
-      }
-
       return true;
     });
-  }, [listings, filters, activeTags, activePrice]);
+  }, [listings, search, category, district, activeTags, activePrice, tagMode]);
 
-  const categories = CATEGORIES.map((c) => c.id);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paged = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  return (
-    <div className="max-w-5xl mx-auto px-6 pt-32 pb-20">
-      <div className="flex items-end justify-between mb-1">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {t("directory", language)}
-          </h1>
-          <p className="text-[#6B6890] text-sm mt-1">
-            {filtered.length} / {listings.length} {isZh(language) ? "香港 LGBTQ+ 友善空間及支援" : "LGBTQ+-friendly spaces and support across Hong Kong"}
-          </p>
-        </div>
+  const hasActiveFilters = search || category || district || activeTags.length > 0 || activePrice;
 
-        {/* View toggle */}
-        <div className="flex items-center gap-1 bg-[#F5F4FA] rounded-lg p-1">
-          <button
-            onClick={() => setView("grid")}
-            className={`p-1.5 rounded-md transition-colors ${view === "grid" ? "bg-white shadow-sm text-[#7B68EE]" : "text-[#6B6890] hover:text-[#7B68EE]"}`}
-            aria-label="Grid view"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-          </button>
-          <button
-            onClick={() => setView("list")}
-            className={`p-1.5 rounded-md transition-colors ${view === "list" ? "bg-white shadow-sm text-[#7B68EE]" : "text-[#6B6890] hover:text-[#7B68EE]"}`}
-            aria-label="List view"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <FilterBar
-          categories={categories}
-          districts={districts}
-          onFilter={setFilters}
-          initialCategory={initialCategory}
-          initialSearch={initialSearch}
+  const filterSidebar = (
+    <div className="space-y-5">
+      {/* Search */}
+      <div>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          placeholder={isZh(language) ? "搜索空間、服務..." : "Search spaces, services..."}
+          className="w-full px-3 py-2 rounded-lg border border-[#E8E6F0] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]"
         />
       </div>
 
-      {/* Tag filter — multi-select */}
-      <div className="mt-3">
-        <button
-          onClick={() => setShowTags(!showTags)}
-          className="flex items-center gap-2 text-sm font-medium text-[#6B6890] hover:text-[#7B68EE] transition-colors"
-        >
-          <svg
-            className={`w-4 h-4 transition-transform ${showTags ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-          {activeTags.length > 0
-            ? `${isZh(language) ? "標籤" : "Tags"} (${activeTags.length})`
-            : isZh(language) ? "篩選標籤" : "Filter by Tags"}
-          {activeTags.length > 0 && (
-            <>
-              <span
-                onClick={(e) => { e.stopPropagation(); setTagMode(tagMode === "and" ? "or" : "and"); }}
-                className="ml-1 text-xs bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 hover:bg-[#E0DDFF] cursor-pointer"
-                title={tagMode === "and" ? "Showing listings with ALL tags" : "Showing listings with ANY tag"}
-              >
-                {tagMode === "and" ? "AND" : "OR"}
-              </span>
-              <span
-                onClick={(e) => { e.stopPropagation(); setActiveTags([]); }}
-                className="ml-1 text-xs bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 hover:bg-[#E0DDFF] cursor-pointer"
-              >
-                {isZh(language) ? "清除" : "Clear"}
-              </span>
-            </>
+      {/* District */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-[#1E1B3A]">{isZh(language) ? "地區" : "District"}</p>
+          {district && (
+            <button onClick={() => { setDistrict(""); setPage(1); }} className="text-[10px] text-[#7B68EE] hover:underline">
+              {isZh(language) ? "清除" : "Clear"}
+            </button>
           )}
-        </button>
-        {showTags && (
-          <div className="mt-2 space-y-3">
-            {TAG_GROUPS.map((group) => {
-              const availableTags = group.tags.filter((t) => tags.includes(t));
-              if (availableTags.length === 0) return null;
-              const groupLabel = language === "zh-Hans" ? group.zhHans : language === "zh" ? group.zh : group.label;
-              return (
-                <div key={group.label}>
-                  <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-1.5">{groupLabel}</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {availableTags.map((tag) => (
-                      <button
-                        key={tag}
-                        onClick={() => toggleTag(tag)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
-                          activeTags.includes(tag)
-                            ? "bg-[#7B68EE] text-white border-[#7B68EE]"
-                            : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA] hover:text-[#7B68EE]"
-                        }`}
-                      >
-                        {translateTag(tag, language)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-            {/* Ungrouped tags */}
-            {(() => {
-              const groupedTags = TAG_GROUPS.flatMap((g) => g.tags);
-              const ungrouped = tags.filter((t) => !groupedTags.includes(t));
-              if (ungrouped.length === 0) return null;
-              return (
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-1.5">{isZh(language) ? "其他" : "Other"}</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {ungrouped.map((tag) => (
-                      <button
-                        key={tag}
-                        onClick={() => toggleTag(tag)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
-                          activeTags.includes(tag)
-                            ? "bg-[#7B68EE] text-white border-[#7B68EE]"
-                            : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA] hover:text-[#7B68EE]"
-                        }`}
-                      >
-                        {translateTag(tag, language)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {districts.map((d) => (
+            <button
+              key={d}
+              onClick={() => { setDistrict(district === d ? "" : d); setPage(1); }}
+              className={`px-2 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+                district === d
+                  ? "bg-[#7B68EE] text-white border-[#7B68EE]"
+                  : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+              }`}
+            >
+              {isZh(language) ? translateDistrict(d, language) : d}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Price filter */}
+      {/* Price */}
       {prices.length > 0 && (
-        <div className="mt-3">
-          <button
-            onClick={() => setShowPrices(!showPrices)}
-            className="flex items-center gap-2 text-sm font-medium text-[#6B6890] hover:text-[#7B68EE] transition-colors"
-          >
-            <svg
-              className={`w-4 h-4 transition-transform ${showPrices ? "rotate-180" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-            {activePrice
-              ? `${isZh(language) ? "價格" : "Price"}: ${activePrice}`
-              : isZh(language) ? "篩選價格" : "Filter by Price"}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-semibold text-[#1E1B3A]">{isZh(language) ? "價格" : "Price"}</p>
             {activePrice && (
-              <span
-                onClick={(e) => { e.stopPropagation(); setActivePrice(""); }}
-                className="ml-1 text-xs bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 hover:bg-[#E0DDFF] cursor-pointer"
-              >
-                ✕
-              </span>
+              <button onClick={() => { setActivePrice(""); setPage(1); }} className="text-[10px] text-[#7B68EE] hover:underline">
+                {isZh(language) ? "清除" : "Clear"}
+              </button>
             )}
-          </button>
-          {showPrices && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {prices.map((price) => (
-                <button
-                  key={price}
-                  onClick={() => setActivePrice(activePrice === price ? "" : price)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
-                    activePrice === price
-                      ? "bg-amber-500 text-white border-amber-500"
-                      : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-amber-300 hover:text-amber-700"
-                  }`}
-                >
-                  {isZh(language) && price === "Free" ? "免費" : price}
-                </button>
-              ))}
-            </div>
-          )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {prices.map((p) => (
+              <button
+                key={p}
+                onClick={() => { setActivePrice(activePrice === p ? "" : p); setPage(1); }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+                  activePrice === p
+                    ? "bg-amber-500 text-white border-amber-500"
+                    : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-amber-300"
+                }`}
+              >
+                {isZh(language) && p === "Free" ? "免費" : p}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      <div className="mt-6">
-        {view === "grid" ? (
-          <ListingGrid listings={filtered} onSelect={setSelectedListing} />
-        ) : (
-          <ListingList listings={filtered} onSelect={setSelectedListing} />
-        )}
+      {/* Tags — grouped */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-[#1E1B3A]">
+            {isZh(language) ? "標籤" : "Tags"}
+            {activeTags.length > 0 && (
+              <span
+                onClick={() => setTagMode(tagMode === "and" ? "or" : "and")}
+                className="ml-2 text-[10px] bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 cursor-pointer hover:bg-[#E0DDFF]"
+              >
+                {tagMode === "and" ? "AND" : "OR"}
+              </span>
+            )}
+          </p>
+          {activeTags.length > 0 && (
+            <button onClick={() => { setActiveTags([]); setPage(1); }} className="text-[10px] text-[#7B68EE] hover:underline">
+              {isZh(language) ? "清除" : "Clear"}
+            </button>
+          )}
+        </div>
+        <div className="space-y-3">
+          {TAG_GROUPS.map((group) => {
+            const availableTags = group.tags.filter((t) => tags.includes(t));
+            if (availableTags.length === 0) return null;
+            const groupLabel = language === "zh-Hans" ? group.zhHans : language === "zh" ? group.zh : group.label;
+            return (
+              <div key={group.label}>
+                <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-1">{groupLabel}</p>
+                <div className="flex flex-wrap gap-1">
+                  {availableTags.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag)}
+                      className={`px-2 py-0.5 rounded text-[11px] font-medium border transition-colors ${
+                        activeTags.includes(tag)
+                          ? "bg-[#7B68EE] text-white border-[#7B68EE]"
+                          : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+                      }`}
+                    >
+                      {translateTag(tag, language)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Slide-out detail panel */}
+      {hasActiveFilters && (
+        <button
+          onClick={resetFilters}
+          className="w-full py-2 text-xs font-medium text-[#7B68EE] bg-[#F0EEFF] rounded-lg hover:bg-[#E0DDFF] transition-colors"
+        >
+          {isZh(language) ? "重置所有篩選" : "Reset all"}
+        </button>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 md:px-6 pt-28 pb-20">
+      {/* Page header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-[#1E1B3A]">
+          {t("directory", language)}
+        </h1>
+        <p className="text-[#6B6890] text-sm mt-1">
+          {isZh(language) ? "香港 LGBTQ+ 友善空間及支援" : "LGBTQ+-friendly spaces and support across Hong Kong"}
+        </p>
+      </div>
+
+      <div className="flex gap-6">
+        {/* ── Left sidebar (desktop) ── */}
+        <aside className="hidden lg:block w-[260px] shrink-0">
+          <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 pb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold text-[#1E1B3A]">{isZh(language) ? "篩選" : "Filter"}</h2>
+              {hasActiveFilters && (
+                <button onClick={resetFilters} className="text-[10px] text-[#7B68EE] hover:underline">
+                  {isZh(language) ? "重置" : "Reset all"}
+                </button>
+              )}
+            </div>
+            {filterSidebar}
+          </div>
+        </aside>
+
+        {/* ── Main content ── */}
+        <main className="flex-1 min-w-0">
+          {/* Category tabs */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <button
+              onClick={() => { setCategory(""); setPage(1); }}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                !category ? "bg-[#7B68EE] text-white" : "bg-white text-[#6B6890] border border-[#E8E6F0] hover:border-[#A78BFA]"
+              }`}
+            >
+              {isZh(language) ? "全部" : "All"}
+            </button>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => { setCategory(category === cat.id ? "" : cat.id); setPage(1); }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  category === cat.id ? "bg-[#7B68EE] text-white" : "bg-white text-[#6B6890] border border-[#E8E6F0] hover:border-[#A78BFA]"
+                }`}
+              >
+                {cat.emoji} {getCategoryName(cat, language)}
+              </button>
+            ))}
+          </div>
+
+          {/* Mobile filter toggle */}
+          <button
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className="lg:hidden flex items-center gap-2 mb-4 px-3 py-2 rounded-lg border border-[#E8E6F0] text-sm text-[#6B6890] hover:border-[#A78BFA]"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            {isZh(language) ? "篩選" : "Filters"}
+            {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-[#7B68EE]" />}
+          </button>
+
+          {/* Mobile filters */}
+          {showMobileFilters && (
+            <div className="lg:hidden mb-6 p-4 bg-[#FAFAFE] rounded-xl border border-[#E8E6F0]">
+              {filterSidebar}
+            </div>
+          )}
+
+          {/* Results count */}
+          <p className="text-xs text-[#6B6890] mb-3 tabular-nums">
+            {filtered.length} {isZh(language) ? "個結果" : "Results"}
+          </p>
+
+          {/* Card grid — 3 columns */}
+          {paged.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {paged.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} onSelect={setSelectedListing} />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-[#E8E6F0] py-16 text-center">
+              <div className="text-3xl mb-3">🔍</div>
+              <p className="text-[#6B6890] text-sm">
+                {isZh(language) ? "找不到符合條件的機構。" : "No listings found matching your filters."}
+              </p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-1 mt-8">
+              <button
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="p-2 rounded-lg text-[#6B6890] hover:bg-[#F0EEFF] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                .reduce<(number | "...")[]>((acc, p, i, arr) => {
+                  if (i > 0 && p - (arr[i - 1]) > 1) acc.push("...");
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, i) =>
+                  p === "..." ? (
+                    <span key={`dots-${i}`} className="px-2 text-[#6B6890] text-sm">...</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p as number)}
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                        page === p
+                          ? "bg-[#7B68EE] text-white"
+                          : "text-[#6B6890] hover:bg-[#F0EEFF]"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              <button
+                onClick={() => setPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                className="p-2 rounded-lg text-[#6B6890] hover:bg-[#F0EEFF] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Slide-out panel */}
       {selectedListing && (
-        <ListingPanel
-          listing={selectedListing}
-          onClose={() => setSelectedListing(null)}
-        />
+        <ListingPanel listing={selectedListing} onClose={() => setSelectedListing(null)} />
       )}
     </div>
   );
