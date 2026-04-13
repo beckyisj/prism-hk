@@ -210,8 +210,10 @@ function FormEmbed({ title, desc, emoji, gradient, formUrl, language }: {
           <iframe
             src={formUrl}
             className="w-full border-0"
-            style={{ height: "600px" }}
+            style={{ height: "1200px" }}
             title={title}
+            allow="autoplay; clipboard-write; encrypted-media"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
           />
         </div>
       )}
