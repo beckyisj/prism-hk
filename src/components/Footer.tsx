@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t } from "@/lib/i18n";
@@ -46,6 +47,27 @@ const socials = [
 
 export default function Footer() {
   const { language } = useLanguage();
+  const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "success" | "duplicate" | "error">("idle");
+
+  async function handleSubscribe(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const email = (new FormData(e.currentTarget).get("email") as string || "").trim();
+    if (!email) return;
+    setSubscribeStatus("loading");
+    try {
+      const res = await fetch("/api/newsletter-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "footer" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Subscribe failed");
+      setSubscribeStatus(data.alreadySubscribed ? "duplicate" : "success");
+      if (!data.alreadySubscribed) (e.target as HTMLFormElement).reset();
+    } catch {
+      setSubscribeStatus("error");
+    }
+  }
 
   return (
     <footer
@@ -91,28 +113,40 @@ export default function Footer() {
           <p className="text-xs text-[#6B6890] mb-3">
             {language === "zh-Hans" ? "每月获取最新活动和故事，绝对不想错过！" : language === "zh" ? "每月獲取最新活動和故事，絕對不想錯過！" : "Subscribe to our monthly newsletter for events and stories you don't want to miss!"}
           </p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const email = new FormData(e.currentTarget).get("email") as string;
-              if (email) window.location.href = `mailto:hello@prism.lgbt?subject=Newsletter%20subscribe&body=Please%20add%20${encodeURIComponent(email)}%20to%20the%20PRISM%20newsletter.`;
-            }}
-            className="flex gap-2"
-          >
+          <form onSubmit={handleSubscribe} className="flex gap-2">
             <input
               type="email"
               name="email"
               required
+              disabled={subscribeStatus === "loading"}
               placeholder={language === "zh-Hans" ? "输入电邮地址" : language === "zh" ? "輸入電郵地址" : "Enter your email"}
-              className="flex-1 px-3 py-2 text-sm rounded-full border border-[#E8E6F0] bg-white focus:outline-none focus:border-[#7B68EE] focus:ring-2 focus:ring-[#7B68EE]/20"
+              className="flex-1 px-3 py-2 text-sm rounded-full border border-[#E8E6F0] bg-white focus:outline-none focus:border-[#7B68EE] focus:ring-2 focus:ring-[#7B68EE]/20 disabled:opacity-60"
             />
             <button
               type="submit"
-              className="px-4 py-2 rounded-full bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white text-sm font-semibold hover:shadow-md transition-[box-shadow]"
+              disabled={subscribeStatus === "loading"}
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white text-sm font-semibold hover:shadow-md transition-[box-shadow] disabled:opacity-60"
             >
-              {language === "zh-Hans" ? "订阅" : language === "zh" ? "訂閱" : "Subscribe"}
+              {subscribeStatus === "loading"
+                ? (language === "zh-Hans" ? "提交中..." : language === "zh" ? "提交中..." : "Sending...")
+                : (language === "zh-Hans" ? "订阅" : language === "zh" ? "訂閱" : "Subscribe")}
             </button>
           </form>
+          {subscribeStatus === "success" && (
+            <p className="text-xs text-[#059669] mt-2">
+              {language === "zh-Hans" ? "订阅成功！感谢你加入 PRISM 通讯 🫶" : language === "zh" ? "訂閱成功！感謝你加入 PRISM 通訊 🫶" : "Subscribed! Thanks for joining PRISM 🫶"}
+            </p>
+          )}
+          {subscribeStatus === "duplicate" && (
+            <p className="text-xs text-[#6B6890] mt-2">
+              {language === "zh-Hans" ? "你已订阅过了，谢谢！" : language === "zh" ? "你已訂閱過了，謝謝！" : "You're already subscribed. Thanks!"}
+            </p>
+          )}
+          {subscribeStatus === "error" && (
+            <p className="text-xs text-[#DC2626] mt-2">
+              {language === "zh-Hans" ? "提交失败，请稍后再试" : language === "zh" ? "提交失敗，請稍後再試" : "Couldn't subscribe. Please try again."}
+            </p>
+          )}
         </div>
 
         {/* Middle: Link columns */}
