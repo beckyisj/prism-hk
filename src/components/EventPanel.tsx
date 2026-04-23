@@ -114,6 +114,30 @@ function downloadICS(event: PrismEvent, name: string, venue: string | null, desc
   URL.revokeObjectURL(url);
 }
 
+function googleCalendarUrl(event: PrismEvent, name: string, venue: string | null, description: string | null): string | null {
+  const date = event.date.split("/");
+  if (date.length !== 3) return null;
+  const [d, mo, y] = date;
+  const dateStr = `${y}${mo.padStart(2, "0")}${d.padStart(2, "0")}`;
+  const start = to24Hour(event.start_time) || "000000";
+  const end = to24Hour(event.end_time) || start;
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: name,
+    dates: `${dateStr}T${start}/${dateStr}T${end}`,
+    ctz: "Asia/Hong_Kong",
+  });
+  if (venue) params.set("location", venue);
+  const desc = [description, event.link].filter(Boolean).join("\n\n");
+  if (desc) params.set("details", desc);
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function isMobile(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+}
+
 export default function EventPanel({
   event,
   onClose,
@@ -328,12 +352,29 @@ export default function EventPanel({
           )}
 
           {eventDate && (
-            <button
-              onClick={() => downloadICS(event, name, venue, description)}
-              className="mt-3 block w-full text-center px-6 py-3 rounded-xl bg-white border border-[#E8E6F0] text-[#1E1B3A] font-semibold text-sm hover:border-[#A78BFA] hover:shadow-sm transition-[border-color,box-shadow]"
-            >
-              📅 {isZh(language) ? "加入日曆" : "Add to Calendar"}
-            </button>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {(() => {
+                const gcalUrl = googleCalendarUrl(event, name, venue, description);
+                if (!gcalUrl) return null;
+                return (
+                  <a
+                    href={gcalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-center px-3 py-3 rounded-xl bg-white border border-[#E8E6F0] text-[#1E1B3A] font-semibold text-xs hover:border-[#A78BFA] hover:shadow-sm transition-[border-color,box-shadow]"
+                  >
+                    📅 {isZh(language) ? "Google 日曆" : "Google Calendar"}
+                  </a>
+                );
+              })()}
+              <button
+                onClick={() => downloadICS(event, name, venue, description)}
+                className="block w-full text-center px-3 py-3 rounded-xl bg-white border border-[#E8E6F0] text-[#1E1B3A] font-semibold text-xs hover:border-[#A78BFA] hover:shadow-sm transition-[border-color,box-shadow]"
+                title={isMobile() ? (isZh(language) ? "iOS：下載 .ics 後在日曆打開" : "iOS: download .ics then open in Calendar") : ""}
+              >
+                📥 {isZh(language) ? "下載 .ics" : "Download .ics"}
+              </button>
+            </div>
           )}
         </div>
       </div>

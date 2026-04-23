@@ -5,15 +5,9 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { t, isZh, type Language } from "@/lib/i18n";
 import { type PrismEvent } from "@/lib/events";
 import { translateTag } from "@/lib/tagTranslations";
+import { translateDistrict } from "@/lib/districtTranslations";
 import EventPanel from "@/components/EventPanel";
-
-const COMMUNITY_ORGS = [
-  { name: "Hong Kong Pride", zh: "香港同志遊行", url: "https://www.hkpride.net", emoji: "🏳️‍🌈" },
-  { name: "Pink Alliance", zh: "粉紅聯盟", url: "https://www.pinkalliance.hk", emoji: "💖" },
-  { name: "AIDS Concern", zh: "關懷愛滋", url: "https://aidsconcern.org.hk", emoji: "❤️" },
-  { name: "Les Peches", zh: "Les Peches", url: "https://www.instagram.com/lespeches.hk", emoji: "🍑" },
-  { name: "Out in HK", zh: "Out in HK", url: "https://www.outinhk.com", emoji: "🌈" },
-];
+import MapEmbed from "@/components/MapEmbed";
 
 function parseDate(dateStr: string): Date | null {
   if (!dateStr) return null;
@@ -83,6 +77,8 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
 
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState<string>("");
+  const [activeDistrict, setActiveDistrict] = useState<string>("");
+  const [pageSize, setPageSize] = useState<number>(20);
 
   const today = new Date(new Date().toDateString());
 
@@ -92,11 +88,18 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
     return Array.from(s).sort();
   }, [events]);
 
+  const allDistricts = useMemo(() => {
+    const s = new Set<string>();
+    events.forEach((e) => { if (e.district) s.add(e.district); });
+    return Array.from(s).sort();
+  }, [events]);
+
   const filteredEvents = useMemo(() => {
     const q = search.trim().toLowerCase();
     const normalizedQ = q.replace(/[^a-z0-9一-鿿]+/g, "");
     return events.filter((e) => {
       if (activeTag && !e.tags.includes(activeTag)) return false;
+      if (activeDistrict && e.district !== activeDistrict) return false;
       if (q) {
         const bag = [
           e.name_en, e.name_zh, e.name_zhHans,
@@ -110,7 +113,7 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
       }
       return true;
     });
-  }, [events, search, activeTag]);
+  }, [events, search, activeTag, activeDistrict]);
 
   const upcomingEvents = useMemo(() =>
     filteredEvents.filter((e) => {
@@ -196,39 +199,113 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
           className="w-full px-4 py-2.5 rounded-xl border border-[#E8E6F0] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]"
         />
         {allTags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              onClick={() => setActiveTag("")}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                !activeTag ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
-              }`}
-            >
-              {isZh(language) ? "全部" : "All"}
-            </button>
-            {allTags.map((tag) => (
+          <div>
+            <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-1.5">
+              {isZh(language) ? "標籤" : "Tag"}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
               <button
-                key={tag}
-                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                onClick={() => setActiveTag("")}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                  activeTag === tag ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+                  !activeTag ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
                 }`}
               >
-                {translateTag(tag, language)}
+                {isZh(language) ? "全部" : "All"}
               </button>
-            ))}
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    activeTag === tag ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+                  }`}
+                >
+                  {translateTag(tag, language)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {allDistricts.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-1.5">
+              {isZh(language) ? "地區" : "District"}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                onClick={() => setActiveDistrict("")}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  !activeDistrict ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+                }`}
+              >
+                {isZh(language) ? "全部" : "All"}
+              </button>
+              {allDistricts.map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setActiveDistrict(activeDistrict === d ? "" : d)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    activeDistrict === d ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+                  }`}
+                >
+                  {isZh(language) ? translateDistrict(d, language) : d}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
+
+      {/* Map embed (list view only; auto-scopes to filtered events) */}
+      {view === "list" && upcomingEvents.length > 0 && upcomingEvents.length <= 50 && (
+        <MapEmbed
+          places={upcomingEvents.map((e) => ({
+            name: e.name_en,
+            address: e.venue_en,
+            district: e.district,
+          }))}
+        />
+      )}
 
       {/* List view */}
       {view === "list" && (
         <>
           {upcomingEvents.length > 0 ? (
-            <div className="space-y-4 mb-16">
-              {upcomingEvents.map((event, i) => (
-                <EventCard key={i} event={event} language={language} onClick={() => setSelectedEvent(event)} />
-              ))}
-            </div>
+            <>
+              <div className="flex items-center justify-between mb-3 text-xs text-[#6B6890]">
+                <span className="tabular-nums">
+                  {upcomingEvents.length} {isZh(language) ? "個活動" : upcomingEvents.length === 1 ? "event" : "events"}
+                </span>
+                <label className="flex items-center gap-2">
+                  <span>{isZh(language) ? "顯示" : "Show"}</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                    className="px-2 py-1 rounded-md border border-[#E8E6F0] bg-white text-xs focus:outline-none focus:border-[#7B68EE]"
+                  >
+                    {[10, 20, 50, 100].map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                    <option value={upcomingEvents.length}>{isZh(language) ? "全部" : "All"}</option>
+                  </select>
+                </label>
+              </div>
+              <div className="space-y-4 mb-16">
+                {upcomingEvents.slice(0, pageSize).map((event, i) => (
+                  <EventCard key={i} event={event} language={language} onClick={() => setSelectedEvent(event)} />
+                ))}
+              </div>
+              {upcomingEvents.length > pageSize && (
+                <div className="text-center mb-16 -mt-10">
+                  <button
+                    onClick={() => setPageSize((n) => n + 20)}
+                    className="px-5 py-2 rounded-full border border-[#E8E6F0] text-sm text-[#6B6890] hover:border-[#A78BFA] hover:text-[#7B68EE] transition-colors"
+                  >
+                    {isZh(language) ? "載入更多" : "Load more"}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <EmptyState language={language} />
           )}
@@ -354,39 +431,6 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
         >
           📅 {isZh(language) ? "訂閱日曆" : "Subscribe to Calendar"}
         </a>
-      </div>
-
-      {/* Community orgs */}
-      <div>
-        <h2 className="text-xl font-bold text-[#1E1B3A] mb-1">
-          {isZh(language) ? "社區組織" : "Community Organizations"}
-        </h2>
-        <p className="text-sm text-[#6B6890] mb-6">
-          {isZh(language)
-            ? "關注以下組織以獲取更多活動資訊"
-            : "Follow these organizations for more events"}
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {COMMUNITY_ORGS.map((org) => (
-            <a
-              key={org.name}
-              href={org.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 p-4 bg-white rounded-xl border border-[#E8E6F0] hover:border-[#A78BFA] hover:shadow-md transition-[border-color,box-shadow] active:scale-[0.98]"
-            >
-              <span className="text-2xl">{org.emoji}</span>
-              <div>
-                <div className="font-semibold text-sm text-[#1E1B3A]">
-                  {isZh(language) ? org.zh : org.name}
-                </div>
-                {isZh(language) && org.name !== org.zh && (
-                  <div className="text-xs text-[#6B6890]">{org.name}</div>
-                )}
-              </div>
-            </a>
-          ))}
-        </div>
       </div>
 
       {/* Event slide-out panel */}

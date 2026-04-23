@@ -7,6 +7,7 @@ import { type PrismEvent } from "@/lib/events";
 import { type Article } from "@/lib/articles";
 import ListingCard from "@/components/ListingCard";
 import ListingPanel from "@/components/ListingPanel";
+import MapEmbed from "@/components/MapEmbed";
 import { CATEGORIES, getCategoryName } from "@/lib/categories";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, isZh } from "@/lib/i18n";
@@ -23,7 +24,19 @@ const TAG_GROUPS: { label: string; zh: string; zhHans: string; tags: string[] }[
   { label: "Amenities", zh: "設施", zhHans: "设施", tags: ["pet-friendly", "non-alcoholic", "wheelchair-accessible"] },
 ];
 
-const ITEMS_PER_PAGE = 30;
+const PAGE_SIZE_OPTIONS = [10, 30, 50, 100];
+const PRICE_TIERS = ["Free", "$", "$$", "$$$", "$$$$"];
+
+function priceToTier(price: string | null): number | null {
+  if (!price) return null;
+  const p = price.trim();
+  if (p === "Free" || /^free$/i.test(p)) return 0;
+  if (p === "$") return 1;
+  if (p === "$$") return 2;
+  if (p === "$$$") return 3;
+  if (p === "$$$$") return 4;
+  return null;
+}
 
 export default function DirectoryClient({
   listings,
@@ -52,11 +65,12 @@ export default function DirectoryClient({
   const [category, setCategory] = useState(initialCategory);
   const [district, setDistrict] = useState("");
   const [activeTags, setActiveTags] = useState<string[]>(allInitialTags);
-  const [activePrice, setActivePrice] = useState("");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 4]);
   const [tagMode, setTagMode] = useState<"and" | "or">(allInitialTags.length > 1 ? "or" : "and");
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [page, setPage] = useState(1);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(30);
 
   function toggleTag(tag: string) {
     setActiveTags((prev) =>
@@ -70,7 +84,7 @@ export default function DirectoryClient({
     setCategory("");
     setDistrict("");
     setActiveTags([]);
-    setActivePrice("");
+    setPriceRange([0, 4]);
     setPage(1);
   }
 
@@ -84,7 +98,14 @@ export default function DirectoryClient({
           if (!activeTags.every((t) => listingTags.includes(t))) return false;
         }
       }
-      if (activePrice && listing.price !== activePrice) return false;
+      if (priceRange[0] !== 0 || priceRange[1] !== 4) {
+        const tier = priceToTier(listing.price);
+        if (tier === null) {
+          // null/Various — only show when slider is at full range (unfiltered)
+        } else if (tier < priceRange[0] || tier > priceRange[1]) {
+          return false;
+        }
+      }
       if (category && !listing.category?.includes(category)) return false;
       if (district) {
         const listingDistricts = listing.district_en?.split(",").map((d) => d.trim()) || [];
@@ -105,13 +126,19 @@ export default function DirectoryClient({
         if (!searchable.includes(q) && !searchableNorm.includes(qNorm)) return false;
       }
       return true;
+    }).sort((a, b) => {
+      // Featured first, then alphabetical by name. Fixes bug where multi-category
+      // listings got pushed to the end of single-category filter results (the
+      // Supabase query sorted by the raw category string).
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return (a.name_en || "").localeCompare(b.name_en || "");
     });
-  }, [listings, search, category, district, activeTags, activePrice, tagMode]);
+  }, [listings, search, category, district, activeTags, priceRange, tagMode]);
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paged = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paged = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
-  const hasActiveFilters = search || category || district || activeTags.length > 0 || activePrice;
+  const hasActiveFilters = search || category || district || activeTags.length > 0 || priceRange[0] !== 0 || priceRange[1] !== 4;
 
   const filterSidebar = (
     <div className="space-y-5">
@@ -153,34 +180,50 @@ export default function DirectoryClient({
         </div>
       </div>
 
-      {/* Price */}
-      {prices.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-[#1E1B3A]">{isZh(language) ? "價格" : "Price"}</p>
-            {activePrice && (
-              <button onClick={() => { setActivePrice(""); setPage(1); }} className="text-[10px] text-[#7B68EE] hover:underline">
-                {isZh(language) ? "清除" : "Clear"}
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {prices.map((p) => (
-              <button
-                key={p}
-                onClick={() => { setActivePrice(activePrice === p ? "" : p); setPage(1); }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
-                  activePrice === p
-                    ? "bg-amber-500 text-white border-amber-500"
-                    : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-amber-300"
-                }`}
-              >
-                {isZh(language) && p === "Free" ? "免費" : p}
-              </button>
-            ))}
-          </div>
+      {/* Price range — dual slider: Free → $$$$ */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-[#1E1B3A]">{isZh(language) ? "價格" : "Price"}</p>
+          {(priceRange[0] !== 0 || priceRange[1] !== 4) && (
+            <button onClick={() => { setPriceRange([0, 4]); setPage(1); }} className="text-[10px] text-[#7B68EE] hover:underline">
+              {isZh(language) ? "清除" : "Clear"}
+            </button>
+          )}
         </div>
-      )}
+        <div className="flex items-center justify-between text-xs text-[#6B6890] mb-1 tabular-nums">
+          <span className="font-medium text-[#1E1B3A]">
+            {isZh(language) && priceRange[0] === 0 ? "免費" : PRICE_TIERS[priceRange[0]]}
+          </span>
+          <span className="font-medium text-[#1E1B3A]">
+            {isZh(language) && priceRange[1] === 0 ? "免費" : PRICE_TIERS[priceRange[1]]}
+          </span>
+        </div>
+        <div className="relative h-6 flex items-center">
+          <div className="absolute left-0 right-0 h-1 bg-[#E8E6F0] rounded-full" />
+          <div
+            className="absolute h-1 bg-[#7B68EE] rounded-full"
+            style={{ left: `${(priceRange[0] / 4) * 100}%`, right: `${100 - (priceRange[1] / 4) * 100}%` }}
+          />
+          <input
+            type="range"
+            min={0}
+            max={4}
+            step={1}
+            value={priceRange[0]}
+            onChange={(e) => { const v = Number(e.target.value); setPriceRange([Math.min(v, priceRange[1]), priceRange[1]]); setPage(1); }}
+            className="absolute left-0 right-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#7B68EE] [&::-webkit-slider-thumb]:shadow [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#7B68EE]"
+          />
+          <input
+            type="range"
+            min={0}
+            max={4}
+            step={1}
+            value={priceRange[1]}
+            onChange={(e) => { const v = Number(e.target.value); setPriceRange([priceRange[0], Math.max(v, priceRange[0])]); setPage(1); }}
+            className="absolute left-0 right-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#7B68EE] [&::-webkit-slider-thumb]:shadow [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#7B68EE]"
+          />
+        </div>
+      </div>
 
       {/* Tags — grouped */}
       <div>
@@ -373,10 +416,36 @@ export default function DirectoryClient({
             );
           })()}
 
-          {/* Results count */}
-          <p className="text-xs text-[#6B6890] mb-3 tabular-nums">
-            {filtered.length} {isZh(language) ? "個結果" : "Results"}
-          </p>
+          {/* Results count + page size */}
+          <div className="flex items-center justify-between mb-3 text-xs text-[#6B6890]">
+            <span className="tabular-nums">
+              {filtered.length} {isZh(language) ? "個結果" : "Results"}
+            </span>
+            <label className="flex items-center gap-2">
+              <span>{isZh(language) ? "顯示" : "Show"}</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setPage(1); }}
+                className="px-2 py-1 rounded-md border border-[#E8E6F0] bg-white text-xs focus:outline-none focus:border-[#7B68EE]"
+              >
+                {PAGE_SIZE_OPTIONS.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+                <option value={filtered.length || 1}>{isZh(language) ? "全部" : "All"}</option>
+              </select>
+            </label>
+          </div>
+
+          {/* Map embed — only show when there's an active filter so the map has a focus */}
+          {hasActiveFilters && filtered.length > 0 && filtered.length <= 100 && (
+            <MapEmbed
+              places={filtered.map((l) => ({
+                name: l.name_en,
+                address: l.address,
+                district: l.district_en,
+              }))}
+            />
+          )}
 
           {/* Card grid — 3 columns */}
           {paged.length > 0 ? (
