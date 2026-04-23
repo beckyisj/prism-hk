@@ -39,13 +39,17 @@ async function getScraperSources() {
   const rows = data.values || [];
   if (rows.length < 2) return null;
   const headers = rows[0].map((h) => h.toLowerCase().trim());
-  const urlIdx = headers.findIndex((h) => h.includes("url"));
-  const orgIdx = headers.findIndex((h) => h.includes("org") || h.includes("organization"));
+  const urlIdx = headers.findIndex((h) => h.includes("url") || h.includes("link") || h.includes("rss") || h.includes("ics") || h.includes("feed"));
+  const orgIdx = headers.findIndex((h) => h.includes("org") || h.includes("name"));
+  const statusIdx = headers.findIndex((h) => h.includes("status"));
   const sources = [];
   for (const row of rows.slice(1)) {
     const url = (row[urlIdx] || "").trim();
     const org = (row[orgIdx] || "").trim();
-    if (url) sources.push({ url, org });
+    const status = statusIdx >= 0 ? (row[statusIdx] || "").trim().toLowerCase() : "";
+    if (!url) continue;
+    if (status === "done" || status === "skip" || status === "disabled") continue;
+    sources.push({ url, org });
   }
   return sources;
 }

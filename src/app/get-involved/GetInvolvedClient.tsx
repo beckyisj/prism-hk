@@ -102,7 +102,22 @@ export default function GetInvolvedClient() {
           </div>
         ))}
 
-        {/* Volunteer */}
+        {/* Volunteer with PRISM */}
+        <FormEmbed
+          title={tx("Volunteer With PRISM", "加入 PRISM 義工團隊", "加入 PRISM 义工团队", language)}
+          desc={tx(
+            "Help build Hong Kong's LGBTQ+ directory. Fill out the form to join our volunteer team.",
+            "協助建立香港 LGBTQ+ 目錄。填寫表格加入我們的義工團隊。",
+            "协助建立香港 LGBTQ+ 目录。填写表格加入我们的义工团队。",
+            language
+          )}
+          emoji="🙌"
+          gradient="from-[#FFA726] to-[#FB923C]"
+          formUrl="https://docs.google.com/forms/d/e/1FAIpQLSd5CRkN5sA0nM_Wx620p9lR88fZoI7XwbDmU36QCQ_5h2u0sA/viewform?embedded=true"
+          language={language}
+        />
+
+        {/* Volunteer with partner orgs */}
         <div className="bg-white rounded-2xl border border-[#E8E6F0] p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FFA726] to-[#FB923C] flex items-center justify-center text-xl shrink-0">
@@ -110,13 +125,13 @@ export default function GetInvolvedClient() {
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-bold mb-1">
-                {tx("Volunteer", "義工", "义工", language)}
+                {tx("Volunteer With Partner Orgs", "與合作機構當義工", "与合作机构当义工", language)}
               </h2>
               <p className="text-sm text-[#6B6890] mb-4">
                 {tx(
-                  "Please apply for volunteering opportunities at the following organizations.",
-                  "請到以下機構申請義工機會。",
-                  "请到以下机构申请义工机会。",
+                  "Looking for more ways to give back? Apply directly with our partner organizations.",
+                  "想以更多方式回饋？直接向我們的合作機構申請。",
+                  "想以更多方式回馈？直接向我们的合作机构申请。",
                   language
                 )}
               </p>
