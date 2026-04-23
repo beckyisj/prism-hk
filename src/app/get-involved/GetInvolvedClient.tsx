@@ -145,7 +145,37 @@ export default function GetInvolvedClient() {
           </div>
         </div>
 
-        {/* Donate */}
+        {/* Buy Us a Coffee (PayMe) */}
+        <div className="bg-gradient-to-br from-[#F0EEFF] to-[#FCE4EC] rounded-2xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7B68EE] to-[#A78BFA] flex items-center justify-center text-xl shrink-0">
+              ☕
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold mb-1">
+                {tx("Buy Us a Coffee", "請我們喝杯咖啡", "请我们喝杯咖啡", language)}
+              </h2>
+              <p className="text-sm text-[#6B6890] mb-4">
+                {tx(
+                  "PRISM is volunteer-run. Your support helps keep the platform running and accessible to all.",
+                  "PRISM 由義工運營。你的支持有助保持平台持續運作，向所有人開放。",
+                  "PRISM 由义工运营。你的支持有助保持平台持续运作，向所有人开放。",
+                  language
+                )}
+              </p>
+              <a
+                href="https://payme.hsbc/03ac86ea2d804ce9964d878c722a975b"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7B68EE] text-white rounded-xl font-semibold text-sm hover:bg-[#6B5CE7] transition-colors"
+              >
+                {tx("Donate via PayMe", "透過 PayMe 捐款", "通过 PayMe 捐款", language)} &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Support partner orgs that accept donations */}
         <div className="bg-white rounded-2xl border border-[#E8E6F0] p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#0EA5E9] flex items-center justify-center text-xl shrink-0">
@@ -153,13 +183,13 @@ export default function GetInvolvedClient() {
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-bold mb-1">
-                {tx("Donate", "捐款", "捐款", language)}
+                {tx("Donate to Partner Orgs", "捐款給合作機構", "捐款给合作机构", language)}
               </h2>
               <p className="text-sm text-[#6B6890] mb-4">
                 {tx(
-                  "Support organizations that accept donations.",
-                  "支持接受捐款的機構。",
-                  "支持接受捐款的机构。",
+                  "Support partner organizations that accept donations.",
+                  "支持接受捐款的合作機構。",
+                  "支持接受捐款的合作机构。",
                   language
                 )}
               </p>

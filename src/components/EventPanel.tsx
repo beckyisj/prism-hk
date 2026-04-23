@@ -167,8 +167,10 @@ export default function EventPanel({
             <img
               src={event.image}
               alt={name}
-              className="w-full aspect-video object-cover rounded-xl mb-4 bg-white outline outline-1 outline-black/5"
-              onError={(e) => { e.currentTarget.style.display = "none"; }}
+              loading="lazy"
+              className="w-full aspect-video object-cover rounded-xl mb-4 opacity-0 transition-opacity duration-300"
+              onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
+              onError={(e) => { e.currentTarget.remove(); }}
             />
           )}
           <div className="pr-10">

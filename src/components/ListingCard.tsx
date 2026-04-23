@@ -28,19 +28,23 @@ export default function ListingCard({ listing, onSelect }: { listing: Listing; o
       className="listing-card block bg-white border border-[#E8E6F0] rounded-xl p-4 transition-[border-color,box-shadow] duration-200 cursor-pointer active:scale-[0.98]"
     >
       <div className="flex gap-3">
-        {/* Avatar / Logo */}
-        {listing.logo ? (
-          <img
-            src={listing.logo}
-            alt={listing.name_en}
-            className="w-12 h-12 min-w-[48px] rounded-xl object-cover bg-[#F5F4FA] outline outline-1 outline-black/5"
-            onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextElementSibling?.classList.remove("hidden"); }}
-          />
-        ) : null}
-        <div
-          className={`w-12 h-12 min-w-[48px] rounded-xl bg-gradient-to-br ${avatarGradient} flex items-center justify-center text-white font-semibold text-sm ${listing.logo ? "hidden" : ""}`}
-        >
-          {initials}
+        {/* Avatar / Logo — initials visible by default, logo fades in only if it loads */}
+        <div className="relative w-12 h-12 min-w-[48px]">
+          <div
+            className={`absolute inset-0 rounded-xl bg-gradient-to-br ${avatarGradient} flex items-center justify-center text-white font-semibold text-sm`}
+          >
+            {initials}
+          </div>
+          {listing.logo && (
+            <img
+              src={listing.logo}
+              alt={listing.name_en}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full rounded-xl object-cover opacity-0 transition-opacity duration-300"
+              onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
+              onError={(e) => { e.currentTarget.remove(); }}
+            />
+          )}
         </div>
 
         {/* Content */}

@@ -72,28 +72,12 @@ export default function LearnClient() {
       </h1>
 
       <div className="mt-8 space-y-10">
-        {/* Who are we? */}
+        {/* Who are we? — pulled from Translations sheet via t() */}
         <section>
-          <h2 className="text-xl font-bold mb-3">
-            {tx("Who are we?", "我們是誰？", "我们是谁？", language)}
-          </h2>
+          <h2 className="text-xl font-bold mb-3">{t("learn_whoTitle", language)}</h2>
           <div className="text-[#1E1B3A] leading-relaxed space-y-4">
-            <p>
-              {tx(
-                "PRISM is Hong Kong's central LGBTQ+ directory and events calendar, designed to make it easy to find trusted resources, inclusive services, and community events across all 18 districts. We bring together what's often fragmented, so community members can quickly access support, connection, and opportunities in one place.",
-                "PRISM 是香港的中央 LGBTQ+ 機構目錄及活動日曆，讓你輕鬆找到全港十八區值得信賴的資源、共融服務和社區活動。我們把經常分散的資訊整合在一起，讓社區成員能一站式獲得支援、連繫和機會。",
-                "PRISM 是香港的中央 LGBTQ+ 机构目录及活动日历，让你轻松找到全港十八区值得信赖的资源、共融服务和社区活动。我们把经常分散的信息整合在一起，让社区成员能一站式获得支援、联系和机会。",
-                language
-              )}
-            </p>
-            <p>
-              {tx(
-                "We are a community-driven initiative, built by LGBTQ+ advocates and volunteers who believe visibility and access are the foundation of a stronger, more connected community.",
-                "我們是一個由社區驅動的倡議，由 LGBTQ+ 倡導者和義工共同建立。我們相信可見度與觸達是建立更強大、更緊密連繫社區的基石。",
-                "我们是一个由社区驱动的倡议，由 LGBTQ+ 倡导者和义工共同建立。我们相信可见度与触达是建立更强大、更紧密联系社区的基石。",
-                language
-              )}
-            </p>
+            <p>{t("learn_whoBody1", language)}</p>
+            <p>{t("learn_whoBody2", language)}</p>
           </div>
         </section>
 

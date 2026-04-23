@@ -35,7 +35,6 @@ const navLinks: NavLink[] = [
       { href: "/learn/resources", label: { en: "Educational Resources", zh: "教育資源", zhHans: "教育资源" } },
       { href: "/get-involved", label: { en: "Get Involved", zh: "參與", zhHans: "参与" } },
       { href: "/learn", label: { en: "About PRISM", zh: "關於 PRISM", zhHans: "关于 PRISM" } },
-      { href: "/support", label: { en: "Support Us", zh: "支持我們", zhHans: "支持我们" } },
       { href: "/contact", label: { en: "Contact Us", zh: "聯絡我們", zhHans: "联络我们" } },
     ],
   },

@@ -13,10 +13,15 @@
 
 const fs = require("fs");
 const path = require("path");
+const { Converter } = require("opencc-js");
 
 const SHEET_ID = "1zKolQNmY8g_oDPBPiiQLmFeNC6KFmz7xXCNgBvAtWhY";
 const API_KEY = process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyAruoZCvwELngTPpym_qncSAOmIv_S3pNk";
 const TAB = "Translations";
+
+// Auto-convert Traditional (HK) → Simplified when zhHans is missing.
+// Saves Blake from maintaining two Chinese columns in the sheet.
+const tradToSimp = Converter({ from: "hk", to: "cn" });
 
 const SRC = path.join(__dirname, "..", "src", "lib");
 
@@ -39,7 +44,11 @@ function parseRows(rows) {
     const [section, key, en, zh, zhHans] = rows[i];
     if (!section || !key) continue;
 
-    const entry = { key: key?.trim(), en: en?.trim() || "", zh: zh?.trim() || "", zhHans: zhHans?.trim() || "" };
+    const zhText = zh?.trim() || "";
+    let zhHansText = zhHans?.trim() || "";
+    // Auto-derive Simplified from Traditional if missing
+    if (!zhHansText && zhText) zhHansText = tradToSimp(zhText);
+    const entry = { key: key?.trim(), en: en?.trim() || "", zh: zhText, zhHans: zhHansText };
 
     switch (section?.trim()) {
       case "Tag":

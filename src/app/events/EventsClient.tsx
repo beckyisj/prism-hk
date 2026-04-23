@@ -423,13 +423,15 @@ function EventCard({ event, language, compact, onClick }: { event: PrismEvent; l
           </div>
         )}
 
-        {/* Event image */}
+        {/* Event image — lazy, no outline flash */}
         {event.image && !compact && (
           <img
             src={event.image}
             alt={name}
-            className="flex-shrink-0 w-20 h-20 rounded-xl object-cover bg-[#F5F4FA] outline outline-1 outline-black/5"
-            onError={(e) => { e.currentTarget.style.display = "none"; }}
+            loading="lazy"
+            className="flex-shrink-0 w-20 h-20 rounded-xl object-cover opacity-0 transition-opacity duration-300"
+            onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
+            onError={(e) => { e.currentTarget.remove(); }}
           />
         )}
 

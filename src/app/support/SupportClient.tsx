@@ -3,8 +3,7 @@
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, type Language } from "@/lib/i18n";
 
-// TODO(blake): replace with Blake Chan's PayMe link
-const PAYME_URL = "https://payme.hsbc/prismhk";
+const PAYME_URL = "https://payme.hsbc/03ac86ea2d804ce9964d878c722a975b";
 
 function tx(en: string, zh: string, zhHans: string, language: Language): string {
   if (language === "en") return en;

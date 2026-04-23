@@ -80,7 +80,10 @@ export default function ListingPanel({
               <img
                 src={listing.logo}
                 alt={listing.name_en}
-                className="w-16 h-16 rounded-xl object-cover bg-white shadow-sm mb-3 outline outline-1 outline-black/5"
+                loading="lazy"
+                className="w-16 h-16 rounded-xl object-cover mb-3 opacity-0 transition-opacity duration-300"
+                onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
+                onError={(e) => { e.currentTarget.remove(); }}
               />
             )}
             <h2 className="text-xl font-bold text-[#1E1B3A] leading-snug whitespace-pre-line">

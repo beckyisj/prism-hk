@@ -11,7 +11,6 @@ const linkColumns = [
   { href: "/events", key: "events" as const },
   { href: "/learn", key: "learn" as const },
   { href: "/get-involved", key: "getInvolved" as const },
-  { href: "/support", key: "support" as const },
   { href: "/contact", key: "contact" as const },
 ];
 

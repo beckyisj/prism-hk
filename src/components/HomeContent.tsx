@@ -23,10 +23,17 @@ function parseDate(dateStr: string): Date | null {
 
 function formatTime(time: string | null): string {
   if (!time) return "";
-  const parts = time.split(":");
+  const raw = time.trim().toLowerCase();
+  const ampmMatch = raw.match(/(am|pm)\s*$/);
+  const explicitAmPm = ampmMatch ? ampmMatch[1].toUpperCase() : null;
+  const numeric = raw.replace(/\s*(am|pm)\s*$/, "").trim();
+  const parts = numeric.split(":");
   if (parts.length >= 2) {
-    const h = parseInt(parts[0]);
-    const m = parts[1];
+    let h = parseInt(parts[0]);
+    const m = parts[1].replace(/\D+$/, "").padStart(2, "0").slice(0, 2);
+    if (isNaN(h)) return time;
+    if (explicitAmPm === "PM" && h < 12) h += 12;
+    if (explicitAmPm === "AM" && h === 12) h = 0;
     const ampm = h >= 12 ? "PM" : "AM";
     const h12 = h % 12 || 12;
     return `${h12}:${m} ${ampm}`;

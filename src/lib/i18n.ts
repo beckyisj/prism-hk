@@ -71,6 +71,9 @@ export const ui = {
     // Learn
     learnTitle: "About PRISM",
     learnDesc: "PRISM is an LGBTQ+ directory and community platform for Hong Kong. We connect people with affirming businesses, healthcare providers, community groups, NGOs, and events across all 18 districts.",
+    learn_whoTitle: "Who are we?",
+    learn_whoBody1: "PRISM is Hong Kong's central LGBTQ+ directory and events calendar, designed to make it easy to find trusted resources, inclusive services, and community events across all 18 districts. We bring together what's often fragmented, so community members can quickly access support, connection, and opportunities in one place.",
+    learn_whoBody2: "We are a community-driven initiative, built by LGBTQ+ advocates and volunteers who believe visibility and access are the foundation of a stronger, more connected community.",
 
     // Educational Resources
     resourcesTitle: "Educational Resources",
@@ -149,6 +152,9 @@ export const ui = {
 
     learnTitle: "關於 PRISM",
     learnDesc: "PRISM 是一個服務香港的 LGBTQ+ 資料庫及社區平台。我們將大眾連繫到遍佈十八區的友善商戶、醫療服務提供者、社區組織、非政府組織及活動。",
+    learn_whoTitle: "我們是誰？",
+    learn_whoBody1: "PRISM 是香港的中央 LGBTQ+ 機構目錄及活動日曆，讓你輕鬆找到全港十八區值得信賴的資源、共融服務和社區活動。我們把經常分散的資訊整合在一起，讓社區成員能一站式獲得支援、連繫和機會。",
+    learn_whoBody2: "我們是一個由社區驅動的倡議，由 LGBTQ+ 倡導者和義工共同建立。我們相信可見度與觸達是建立更強大、更緊密連繫社區的基石。",
 
     resourcesTitle: "教育資源",
     resourcesDesc: "了解更多有關香港 LGBTQ+ 議題、權利及支援的資訊。",
@@ -225,6 +231,9 @@ export const ui = {
 
     learnTitle: "关于 PRISM",
     learnDesc: "PRISM 是一个服务香港的 LGBTQ+ 资料库及社区平台。我们将大众连系到遍布十八区的友善商户、医疗服务提供者、社区组织、非政府组织及活动。",
+    learn_whoTitle: "我们是谁？",
+    learn_whoBody1: "PRISM 是香港的中央 LGBTQ+ 机构目录及活动日历，让你轻松找到全港十八区值得信赖的资源、共融服务和社区活动。我们把经常分散的信息整合在一起，让社区成员能一站式获得支援、联系和机会。",
+    learn_whoBody2: "我们是一个由社区驱动的倡议，由 LGBTQ+ 倡导者和义工共同建立。我们相信可见度与触达是建立更强大、更紧密联系社区的基石。",
 
     resourcesTitle: "教育资源",
     resourcesDesc: "了解更多有关香港 LGBTQ+ 议题、权利及支援的资讯。",
