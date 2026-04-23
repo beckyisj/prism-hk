@@ -14,7 +14,12 @@ export default async function HomePage() {
     getEvents(),
   ]);
 
-  const featured = listings.filter((l) => l.verified).slice(0, 6);
+  const featured = (() => {
+    const pinned = listings.filter((l) => l.featured);
+    if (pinned.length >= 3) return pinned.slice(0, 6);
+    const verified = listings.filter((l) => l.verified && !l.featured);
+    return [...pinned, ...verified].slice(0, 6);
+  })();
   const categoriesWithListings = categoryStats.filter((c) => c.count > 0).length;
 
   return (
@@ -22,7 +27,7 @@ export default async function HomePage() {
       {/* 1. Hero + SmartDispatcher */}
       <Hero
         listingsCount={listings.length}
-        categoriesCount={categoriesWithListings || CATEGORIES.length}
+        categoriesCount={7}
         districtsCount={districts.length || 18}
       />
       {/* 2-6. Categories, 18 Districts, Featured, Events, CTA */}
@@ -32,7 +37,7 @@ export default async function HomePage() {
         featured={featured}
         listingsCount={listings.length}
         districtsCount={districts.length || 18}
-        categoriesCount={categoriesWithListings || CATEGORIES.length}
+        categoriesCount={7}
       />
     </>
   );

@@ -190,6 +190,21 @@ export default function GetInvolvedClient() {
           </div>
         </div>
 
+        {/* Partner With Us */}
+        <FormEmbed
+          title={tx("Partner With Us", "成為合作夥伴", "成为合作伙伴", language)}
+          desc={tx(
+            "Organizations can partner with PRISM for events, visibility, and community impact. Fill out the form to get in touch.",
+            "機構可與 PRISM 合作舉辦活動、提高曝光率及促進社區影響。填寫表格與我們聯絡。",
+            "机构可与 PRISM 合作举办活动、提高曝光率及促进社区影响。填写表格与我们联络。",
+            language
+          )}
+          emoji="🤝"
+          gradient="from-[#7B68EE] to-[#E879F9]"
+          formUrl="https://docs.google.com/forms/d/e/1FAIpQLSf2LHbnP44z3dtrNLghiPySD1WXSRm97Cr4znMunmuDo2DDhw/viewform?embedded=true"
+          language={language}
+        />
+
         {/* Feedback form */}
         <FormEmbed
           title={tx("Submit Feedback", "提交意見", "提交意见", language)}

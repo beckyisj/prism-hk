@@ -32,9 +32,9 @@ const navLinks: NavLink[] = [
     key: "more",
     label: { en: "More", zh: "更多", zhHans: "更多" },
     children: [
-      { href: "/learn", label: { en: "About PRISM", zh: "關於 PRISM", zhHans: "关于 PRISM" } },
       { href: "/learn/resources", label: { en: "Educational Resources", zh: "教育資源", zhHans: "教育资源" } },
       { href: "/get-involved", label: { en: "Get Involved", zh: "參與", zhHans: "参与" } },
+      { href: "/learn", label: { en: "About PRISM", zh: "關於 PRISM", zhHans: "关于 PRISM" } },
       { href: "/support", label: { en: "Support Us", zh: "支持我們", zhHans: "支持我们" } },
       { href: "/contact", label: { en: "Contact Us", zh: "聯絡我們", zhHans: "联络我们" } },
     ],
@@ -278,6 +278,37 @@ export default function Nav() {
               </Link>
             );
           })}
+
+          {/* Mobile: language + dark mode */}
+          <div className="pt-3 mt-3 border-t border-[#E8E6F0] space-y-2">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] px-3 mb-1">
+                {isZh(language) ? "語言" : "Language"}
+              </p>
+              <div className="flex gap-1.5 px-3">
+                {([["en", "ENG"], ["zh", "繁中"], ["zh-Hans", "简中"]] as [Language, string][]).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setLanguage(val)}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      language === val ? "bg-[#7B68EE] text-white" : "bg-[#F5F4FA] text-[#1E1B3A] hover:bg-[#E8E6F0]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-[#1E1B3A] hover:bg-[#F5F4FA] transition-colors"
+            >
+              <span>{isZh(language) ? "深色模式" : "Dark mode"}</span>
+              <span className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${darkMode ? "bg-[#7B68EE]" : "bg-[#E8E6F0]"}`}>
+                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${darkMode ? "translate-x-4" : "translate-x-0.5"}`} />
+              </span>
+            </button>
+          </div>
         </div>
       )}
     </nav>

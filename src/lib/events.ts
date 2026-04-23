@@ -35,6 +35,63 @@ export type PrismEvent = {
 // Keep backward-compatible alias
 export type { PrismEvent as PrismEventLegacy };
 
+function parseLogoUrl(value: string | null): string | null {
+  if (!value) return null;
+  const driveMatch = value.match(/(?:id=|\/d\/)([a-zA-Z0-9_-]+)/);
+  if (driveMatch) return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w600`;
+  if (value.startsWith("http")) return value;
+  return null;
+}
+
+function parseDateDMY(str: string): Date | null {
+  const parts = str.split("/");
+  if (parts.length !== 3) return null;
+  const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function formatDateDMY(d: Date): string {
+  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+}
+
+function expandRecurring(event: PrismEvent): PrismEvent[] {
+  const rule = (event.recurring || "").toLowerCase().trim();
+  if (!rule) return [event];
+
+  const seed = parseDateDMY(event.date);
+  if (!seed) return [event];
+
+  const stepDays: Record<string, number> = {
+    weekly: 7, "every week": 7,
+    biweekly: 14, fortnightly: 14, "every 2 weeks": 14,
+  };
+  const today = new Date(new Date().toDateString());
+  const horizon = new Date(today);
+  horizon.setMonth(horizon.getMonth() + 6);
+
+  const occurrences: PrismEvent[] = [];
+  if (stepDays[rule]) {
+    const step = stepDays[rule];
+    let d = new Date(seed);
+    while (d < today) d = new Date(d.getTime() + step * 86400000);
+    while (d <= horizon) {
+      occurrences.push({ ...event, date: formatDateDMY(d) });
+      d = new Date(d.getTime() + step * 86400000);
+    }
+  } else if (rule.includes("monthly") || rule === "every month") {
+    let d = new Date(seed);
+    while (d < today) d = new Date(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    while (d <= horizon) {
+      occurrences.push({ ...event, date: formatDateDMY(d) });
+      d = new Date(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    }
+  } else {
+    return [event];
+  }
+
+  return occurrences.length ? occurrences : [event];
+}
+
 export async function getEvents(): Promise<PrismEvent[]> {
   if (!API_KEY) return [];
 
@@ -75,7 +132,7 @@ export async function getEvents(): Promise<PrismEvent[]> {
         description_en: get("description") || null,
         description_zh: get("description (traditional chinese)") || null,
         description_zhHans: get("description (simplied chinese)") || get("description (simplified chinese)") || null,
-        image: get("logo/image") || null,
+        image: parseLogoUrl(get("logo/image")) || parseLogoUrl(get("image")) || parseLogoUrl(get("logo")) || null,
         price: get("price") || null,
         district: get("district") || null,
         region: get("region") || null,
@@ -92,7 +149,8 @@ export async function getEvents(): Promise<PrismEvent[]> {
       });
     }
 
-    return events;
+    // Expand recurring events into their upcoming occurrences
+    return events.flatMap(expandRecurring);
   } catch (e) {
     console.error("Error fetching events:", e);
     return [];

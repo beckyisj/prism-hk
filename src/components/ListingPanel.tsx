@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { type Listing } from "@/lib/supabase";
+import { type PrismEvent } from "@/lib/events";
 import { getCategoryInfo } from "@/lib/categories";
 import { useLanguage } from "@/lib/LanguageContext";
 import { bilingualText, isZh } from "@/lib/i18n";
@@ -10,20 +11,29 @@ import { translateDistrict } from "@/lib/districtTranslations";
 
 export default function ListingPanel({
   listing,
+  events = [],
   onClose,
 }: {
   listing: Listing;
+  events?: PrismEvent[];
   onClose: () => void;
 }) {
   const { language } = useLanguage();
   const categories = listing.category.split(",").map((c) => c.trim()).filter(Boolean);
   const categoryInfos = categories.map((c) => getCategoryInfo(c));
   const categoryInfo = categoryInfos[0];
-  const name = bilingualText(listing.name_en, listing.name_zh, language);
+  const name = bilingualText(listing.name_en, listing.name_zh, language, listing.name_zhHans);
   const description = bilingualText(
     listing.description_en,
     listing.description_zh,
-    language
+    language,
+    listing.description_zhHans
+  );
+  const address = bilingualText(
+    listing.address,
+    listing.address_zh,
+    language,
+    listing.address_zhHans
   );
 
   // Close on Escape
@@ -133,11 +143,12 @@ export default function ListingPanel({
 
           {/* Details */}
           <div className="space-y-3 mb-6">
-            {listing.address && (
+            {address && (
               <DetailRow
                 icon={<LocationIcon />}
                 label={isZh(language) ? "地址" : "Address"}
-                value={listing.address}
+                value={address}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
               />
             )}
             {listing.hours && (
@@ -211,6 +222,55 @@ export default function ListingPanel({
               )}
             </div>
           )}
+
+          {/* Upcoming events hosted by this org */}
+          {(() => {
+            const today = new Date(new Date().toDateString());
+            const orgNames = [listing.name_en, listing.name_zh, listing.name_zhHans]
+              .filter(Boolean)
+              .map((n) => (n as string).toLowerCase().trim());
+            const upcoming = events
+              .filter((e) => {
+                const orgMatches = [e.org_en, e.org_zh, e.org_zhHans]
+                  .filter(Boolean)
+                  .some((o) => orgNames.includes((o as string).toLowerCase().trim()));
+                if (!orgMatches) return false;
+                const parts = e.date.split("/");
+                if (parts.length !== 3) return true;
+                const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                return d >= today;
+              })
+              .slice(0, 4);
+            if (upcoming.length === 0) return null;
+            return (
+              <div className="mb-6">
+                <p className="text-xs font-medium text-[#6B6890] mb-2">
+                  {isZh(language) ? "即將舉行的活動" : "Upcoming events"}
+                </p>
+                <div className="space-y-2">
+                  {upcoming.map((ev, i) => {
+                    const evName = language === "zh-Hans" ? (ev.name_zhHans || ev.name_zh || ev.name_en) : language === "zh" ? (ev.name_zh || ev.name_en) : ev.name_en;
+                    return (
+                      <a
+                        key={i}
+                        href="/events"
+                        className="flex items-center gap-3 p-2 rounded-lg bg-[#F8F7FF] hover:bg-[#F0EEFF] transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#7B68EE] to-[#E879F9] text-white flex flex-col items-center justify-center text-[10px] leading-tight shrink-0">
+                          <span className="font-bold text-sm">{ev.date.split("/")[0]}</span>
+                          <span className="opacity-80">{ev.date.split("/")[1]}</span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-[#1E1B3A] truncate">{evName}</p>
+                          {ev.start_time && <p className="text-[10px] text-[#6B6890]">{ev.start_time}</p>}
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Tags */}
           {listing.tags && listing.tags.length > 0 && (

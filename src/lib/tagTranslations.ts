@@ -44,7 +44,7 @@ const tagMap: Record<string, { zh: string; zhHans: string }> = {
   "social": { zh: "社交", zhHans: "社交" },
   "sports": { zh: "運動", zhHans: "运动" },
   "sti-testing": { zh: "性病檢測", zhHans: "性病检测" },
-  "telehealth-available": { zh: "可遙距診症", zhHans: "可远程诊疗" },
+  "telehealth-available": { zh: "可遙距診症", zhHans: "可遥距诊症" },
   "transgender": { zh: "跨性別", zhHans: "跨性别" },
   "university": { zh: "大學", zhHans: "大学" },
   "volunteering": { zh: "義工", zhHans: "义工" },

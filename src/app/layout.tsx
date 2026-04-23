@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { LanguageProvider } from "@/lib/LanguageContext";
 import { AccessibilityProvider } from "@/lib/AccessibilityContext";
 import Nav from "@/components/Nav";
@@ -46,6 +47,7 @@ export default function RootLayout({
             <Footer />
           </AccessibilityProvider>
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );

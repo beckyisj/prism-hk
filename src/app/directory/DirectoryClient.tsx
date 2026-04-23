@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { type Listing } from "@/lib/supabase";
+import { type PrismEvent } from "@/lib/events";
+import { type Article } from "@/lib/articles";
 import ListingCard from "@/components/ListingCard";
 import ListingPanel from "@/components/ListingPanel";
 import { CATEGORIES, getCategoryName } from "@/lib/categories";
@@ -28,11 +30,15 @@ export default function DirectoryClient({
   districts,
   tags,
   prices,
+  events = [],
+  articles = [],
 }: {
   listings: Listing[];
   districts: string[];
   tags: string[];
   prices: string[];
+  events?: PrismEvent[];
+  articles?: Article[];
 }) {
   const { language } = useLanguage();
   const searchParams = useSearchParams();
@@ -85,9 +91,18 @@ export default function DirectoryClient({
         if (!listingDistricts.includes(district)) return false;
       }
       if (search) {
+        const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9一-鿿]+/g, "");
         const q = search.toLowerCase();
-        const searchable = [listing.name_en, listing.name_zh, listing.description_en, listing.description_zh, listing.district_en, listing.district_zh, listing.category, ...(listing.tags || [])].filter(Boolean).join(" ").toLowerCase();
-        if (!searchable.includes(q)) return false;
+        const qNorm = normalize(search);
+        const searchable = [
+          listing.name_en, listing.name_zh, listing.name_zhHans,
+          listing.description_en, listing.description_zh, listing.description_zhHans,
+          listing.district_en, listing.district_zh,
+          listing.address, listing.address_zh, listing.address_zhHans,
+          listing.category, ...(listing.tags || []),
+        ].filter(Boolean).join(" ").toLowerCase();
+        const searchableNorm = normalize(searchable);
+        if (!searchable.includes(q) && !searchableNorm.includes(qNorm)) return false;
       }
       return true;
     });
@@ -175,6 +190,7 @@ export default function DirectoryClient({
             {activeTags.length > 0 && (
               <span
                 onClick={() => setTagMode(tagMode === "and" ? "or" : "and")}
+                title={isZh(language) ? (tagMode === "and" ? "AND：必須符合所有標籤。點擊切換到 OR（符合任一標籤）" : "OR：符合任一標籤即可。點擊切換到 AND（必須全部符合）") : (tagMode === "and" ? "AND: match ALL selected tags. Click to switch to OR (match any)" : "OR: match ANY selected tag. Click to switch to AND (match all)")}
                 className="ml-2 text-[10px] bg-[#F0EEFF] text-[#7B68EE] rounded-full px-1.5 py-0.5 cursor-pointer hover:bg-[#E0DDFF]"
               >
                 {tagMode === "and" ? "AND" : "OR"}
@@ -299,6 +315,64 @@ export default function DirectoryClient({
             </div>
           )}
 
+          {/* Cross-surface search results (events + articles) */}
+          {search && (() => {
+            const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9一-鿿]+/g, "");
+            const q = search.toLowerCase();
+            const qNorm = normalize(search);
+            const matchesText = (text: string) => {
+              const t = text.toLowerCase();
+              return t.includes(q) || normalize(t).includes(qNorm);
+            };
+            const matchedEvents = events.filter((e) => {
+              const bag = [e.name_en, e.name_zh, e.name_zhHans, e.org_en, e.org_zh, e.description_en, e.description_zh, ...e.tags].filter(Boolean).join(" ");
+              return bag && matchesText(bag);
+            }).slice(0, 3);
+            const matchedArticles = articles.filter((a) => {
+              const bag = [a.title_en, a.title_zh, a.title_zhHans, a.topic, ...a.tags].filter(Boolean).join(" ");
+              return bag && matchesText(bag);
+            }).slice(0, 3);
+            if (matchedEvents.length === 0 && matchedArticles.length === 0) return null;
+            return (
+              <div className="mb-4 space-y-3">
+                {matchedEvents.length > 0 && (
+                  <div className="p-3 rounded-xl border border-[#E8E6F0] bg-white">
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-2">
+                      {isZh(language) ? "符合的活動" : "Matching events"}
+                    </p>
+                    <div className="flex flex-col gap-1.5">
+                      {matchedEvents.map((e, i) => {
+                        const evName = language === "zh-Hans" ? (e.name_zhHans || e.name_zh || e.name_en) : language === "zh" ? (e.name_zh || e.name_en) : e.name_en;
+                        return (
+                          <a key={i} href="/events" className="text-sm text-[#1E1B3A] hover:text-[#7B68EE] transition-colors">
+                            📅 {evName} <span className="text-[#6B6890] text-xs">· {e.date}</span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                {matchedArticles.length > 0 && (
+                  <div className="p-3 rounded-xl border border-[#E8E6F0] bg-white">
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-[#6B6890] mb-2">
+                      {isZh(language) ? "符合的文章" : "Matching articles"}
+                    </p>
+                    <div className="flex flex-col gap-1.5">
+                      {matchedArticles.map((a, i) => {
+                        const title = language === "zh-Hans" ? (a.title_zhHans || a.title_zh || a.title_en) : language === "zh" ? (a.title_zh || a.title_en) : a.title_en;
+                        return (
+                          <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#1E1B3A] hover:text-[#7B68EE] transition-colors">
+                            📖 {title} <span className="text-[#6B6890] text-xs">· {a.topic}</span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Results count */}
           <p className="text-xs text-[#6B6890] mb-3 tabular-nums">
             {filtered.length} {isZh(language) ? "個結果" : "Results"}
@@ -374,7 +448,7 @@ export default function DirectoryClient({
 
       {/* Slide-out panel */}
       {selectedListing && (
-        <ListingPanel listing={selectedListing} onClose={() => setSelectedListing(null)} />
+        <ListingPanel listing={selectedListing} events={events} onClose={() => setSelectedListing(null)} />
       )}
     </div>
   );

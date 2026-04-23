@@ -52,12 +52,12 @@ function parseCategories(value: string): string {
 
 function parseLogo(value: string): string | null {
   if (!value) return null;
-  // Convert Google Drive share links to direct image URLs
+  // Convert Google Drive share links to thumbnail URLs (hotlink-reliable,
+  // unlike uc?export=view which 403s against many browsers)
   const driveMatch = value.match(/(?:id=|\/d\/)([a-zA-Z0-9_-]+)/);
   if (driveMatch) {
-    return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
+    return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w400`;
   }
-  // Already a direct URL
   if (value.startsWith("http")) return value;
   return null;
 }
@@ -72,13 +72,17 @@ function transformRow(row: SheetRow, rowIndex: number) {
     status: row.status || "Published",
     name_en: row.name_en || "",
     name_zh: row.name_zh || null,
+    name_zhHans: row.name_zhHans || null,
     category: parseCategories(row.category || "Other"),
     tags: parseTags(row.tags || ""),
     price: row.price || null,
     district_en: row.district_en || null,
     district_zh: row.district_zh || null,
+    district_zhHans: row.district_zhHans || null,
     region: row.region || null,
     address: row.address || null,
+    address_zh: row.address_zh || null,
+    address_zhHans: row.address_zhHans || null,
     latitude: row.latitude ? parseFloat(row.latitude) : null,
     longitude: row.longitude ? parseFloat(row.longitude) : null,
     hours: row.hours || null,
@@ -91,8 +95,10 @@ function transformRow(row: SheetRow, rowIndex: number) {
     email: row.email || null,
     description_en: row.description_en || null,
     description_zh: row.description_zh || null,
+    description_zhHans: row.description_zhHans || null,
     logo: parseLogo(row.logo || ""),
     verified: parseBoolean(row.verified || ""),
+    featured: parseBoolean(row.featured || ""),
     last_checked: row.last_checked || null,
     synced_at: new Date().toISOString(),
   };

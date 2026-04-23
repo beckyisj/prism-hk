@@ -3,6 +3,9 @@
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, type Language } from "@/lib/i18n";
 
+// TODO(blake): replace with Blake Chan's PayMe link
+const PAYME_URL = "https://payme.hsbc/prismhk";
+
 function tx(en: string, zh: string, zhHans: string, language: Language): string {
   if (language === "en") return en;
   if (language === "zh") return zh;
@@ -64,10 +67,12 @@ export default function SupportClient() {
                 )}
               </p>
               <a
-                href="/directory?tag=donations"
+                href={PAYME_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7B68EE] text-white rounded-xl font-semibold text-sm hover:bg-[#6B5CE7] transition-colors"
               >
-                {tx("Donate", "捐款", "捐款", language)} &rarr;
+                {tx("Donate via PayMe", "透過 PayMe 捐款", "通过 PayMe 捐款", language)} &rarr;
               </a>
             </div>
           </div>

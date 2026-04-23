@@ -14,11 +14,12 @@ export default function ListingCard({ listing, onSelect }: { listing: Listing; o
   const avatarGradient = getAvatarColor(listing.name_en);
   const initials = getInitials(listing.name_en);
 
-  const name = bilingualText(listing.name_en, listing.name_zh, language);
+  const name = bilingualText(listing.name_en, listing.name_zh, language, listing.name_zhHans);
   const description = bilingualText(
     listing.description_en,
     listing.description_zh,
-    language
+    language,
+    listing.description_zhHans
   );
 
   return (

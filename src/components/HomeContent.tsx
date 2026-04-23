@@ -97,23 +97,41 @@ export default function HomeContent({
       <section className="max-w-5xl mx-auto px-6 py-12">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-[#1E1B3A]">
-            {isZh(language) ? "18 區 1 個社區" : "18 Districts 1 Community"}
+            {isZh(language) ? "一個社區" : "One Community"}
           </h2>
           <p className="text-[#6B6890] mt-2 text-sm max-w-lg mx-auto">
             {isZh(language)
-              ? "在全港十八區找到 LGBTQ+ 活動與支援 — 就在 PRISM。"
-              : "You'll find LGBTQ+ events and support across all 18 districts of Hong Kong — right here at PRISM."}
+              ? "在香港所有地區找到 LGBTQ+ 活動與支援 — 就在 PRISM。"
+              : "You'll find LGBTQ+ events and support across all districts of Hong Kong — right here at PRISM."}
           </p>
         </div>
 
-        {/* Photo row */}
-        <div className="flex justify-center gap-3 md:gap-4 mb-10">
-          {["/hero-2.png", "/hero-3.png", "/hero-4.png", "/hero-6.png"].map((src, i) => (
-            <div key={i} className="w-[140px] md:w-[180px] h-[100px] md:h-[130px] rounded-2xl overflow-hidden shadow-sm outline outline-1 outline-black/5">
-              <img src={src} alt="" className="w-full h-full object-cover" />
+        {/* Photo row — sample from event/listing image pool with fallback */}
+        {(() => {
+          const defaults = ["/hero-2.png", "/hero-3.png", "/hero-4.png", "/hero-6.png"];
+          const pool = [
+            ...events.map((e) => e.image).filter((u): u is string => !!u),
+            ...featured.map((l) => l.logo).filter((u): u is string => !!u),
+          ];
+          const shuffled = [...pool].sort(() => 0.5 - Math.random()).slice(0, 4);
+          const images = shuffled.length >= 4 ? shuffled : [...shuffled, ...defaults].slice(0, 4);
+          return (
+            <div className="flex justify-center gap-3 md:gap-4 mb-10">
+              {images.map((src, i) => (
+                <div key={i} className="w-[140px] md:w-[180px] h-[100px] md:h-[130px] rounded-2xl overflow-hidden shadow-sm outline outline-1 outline-black/5 bg-[#F5F4FA]">
+                  <img
+                    src={src}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = defaults[i % defaults.length];
+                    }}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
 
         <p className="text-center text-sm text-[#6B6890] mb-6">
           {isZh(language)

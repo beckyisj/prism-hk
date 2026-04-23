@@ -261,14 +261,16 @@ export function isZh(lang: Language): boolean {
 export function bilingualText(
   en: string | null | undefined,
   zh: string | null | undefined,
-  lang: Language
+  lang: Language,
+  zhHans?: string | null | undefined
 ): string {
   const enText = en || "";
   const zhText = zh || "";
+  const zhHansText = zhHans || "";
 
-  if (lang === "en") return enText || zhText;
-  if (isZh(lang)) return zhText || enText;
-  // "both" mode fallback
+  if (lang === "en") return enText || zhText || zhHansText;
+  if (lang === "zh-Hans") return zhHansText || zhText || enText;
+  if (lang === "zh") return zhText || enText;
   if (!zhText) return enText;
   if (!enText) return zhText;
   if (enText === zhText) return enText;

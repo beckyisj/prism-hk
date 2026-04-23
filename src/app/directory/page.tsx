@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import { getPublishedListings, getDistinctDistricts, getDistinctTags, getDistinctPrices } from "@/lib/supabase";
+import { getEvents } from "@/lib/events";
+import { getArticles } from "@/lib/articles";
 import DirectoryClient from "./DirectoryClient";
 
 export const revalidate = 300;
@@ -10,16 +12,19 @@ export const metadata = {
 };
 
 export default async function DirectoryPage() {
-  const [listings, districts, tags, prices] = await Promise.all([
+  const [listings, districts, tags, prices, events, articleGroups] = await Promise.all([
     getPublishedListings(),
     getDistinctDistricts(),
     getDistinctTags(),
     getDistinctPrices(),
+    getEvents(),
+    getArticles(),
   ]);
+  const articles = articleGroups.flatMap((g) => g.articles);
 
   return (
     <Suspense>
-      <DirectoryClient listings={listings} districts={districts} tags={tags} prices={prices} />
+      <DirectoryClient listings={listings} districts={districts} tags={tags} prices={prices} events={events} articles={articles} />
     </Suspense>
   );
 }

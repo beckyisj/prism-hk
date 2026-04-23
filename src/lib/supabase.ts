@@ -22,13 +22,17 @@ export type Listing = {
   status: string;
   name_en: string;
   name_zh: string | null;
+  name_zhHans: string | null;
   category: string;
   tags: string[];
   price: string | null;
   district_en: string | null;
   district_zh: string | null;
+  district_zhHans: string | null;
   region: string | null;
   address: string | null;
+  address_zh: string | null;
+  address_zhHans: string | null;
   latitude: number | null;
   longitude: number | null;
   hours: string | null;
@@ -41,8 +45,10 @@ export type Listing = {
   email: string | null;
   description_en: string | null;
   description_zh: string | null;
+  description_zhHans: string | null;
   logo: string | null;
   verified: boolean;
+  featured: boolean;
   last_checked: string | null;
   synced_at: string;
   created_at: string;

@@ -44,7 +44,7 @@ export const CATEGORIES = [
     gradient: "from-[#38BDF8] to-[#0EA5E9]",
     en: "Government",
     zh: "政府",
-    zhHans: "政府机构",
+    zhHans: "政府",
   },
   {
     id: "Media",

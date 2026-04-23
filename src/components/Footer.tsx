@@ -83,6 +83,38 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Newsletter */}
+        <div className="mb-10 p-5 rounded-2xl bg-gradient-to-r from-[#F3F0FF] to-[#FCE4EC] border border-[#E8E6F0]">
+          <p className="text-sm font-semibold text-[#1E1B3A] mb-1">
+            {language === "zh-Hans" ? "订阅我们的每月通讯" : language === "zh" ? "訂閱我們的每月通訊" : "Subscribe to our monthly newsletter"}
+          </p>
+          <p className="text-xs text-[#6B6890] mb-3">
+            {language === "zh-Hans" ? "每月获取最新活动和故事，绝对不想错过！" : language === "zh" ? "每月獲取最新活動和故事，絕對不想錯過！" : "Subscribe to our monthly newsletter for events and stories you don't want to miss!"}
+          </p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const email = new FormData(e.currentTarget).get("email") as string;
+              if (email) window.location.href = `mailto:hello@prism.lgbt?subject=Newsletter%20subscribe&body=Please%20add%20${encodeURIComponent(email)}%20to%20the%20PRISM%20newsletter.`;
+            }}
+            className="flex gap-2"
+          >
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder={language === "zh-Hans" ? "输入电邮地址" : language === "zh" ? "輸入電郵地址" : "Enter your email"}
+              className="flex-1 px-3 py-2 text-sm rounded-full border border-[#E8E6F0] bg-white focus:outline-none focus:border-[#7B68EE] focus:ring-2 focus:ring-[#7B68EE]/20"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white text-sm font-semibold hover:shadow-md transition-[box-shadow]"
+            >
+              {language === "zh-Hans" ? "订阅" : language === "zh" ? "訂閱" : "Subscribe"}
+            </button>
+          </form>
+        </div>
+
         {/* Middle: Link columns */}
         <div className="flex flex-wrap gap-x-6 gap-y-2 mb-10">
           {linkColumns.map((link) => (

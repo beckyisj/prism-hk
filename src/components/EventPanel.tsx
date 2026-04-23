@@ -42,15 +42,76 @@ function parseDate(dateStr: string): Date | null {
 
 function formatTime(time: string | null): string {
   if (!time) return "";
-  const parts = time.split(":");
+  const raw = time.trim().toLowerCase();
+  const ampmMatch = raw.match(/(am|pm)\s*$/);
+  const explicitAmPm = ampmMatch ? ampmMatch[1].toUpperCase() : null;
+  const numeric = raw.replace(/\s*(am|pm)\s*$/, "").trim();
+  const parts = numeric.split(":");
   if (parts.length >= 2) {
-    const h = parseInt(parts[0]);
-    const m = parts[1];
+    let h = parseInt(parts[0]);
+    const m = parts[1].replace(/\D+$/, "").padStart(2, "0").slice(0, 2);
+    if (isNaN(h)) return time;
+    if (explicitAmPm === "PM" && h < 12) h += 12;
+    if (explicitAmPm === "AM" && h === 12) h = 0;
     const ampm = h >= 12 ? "PM" : "AM";
     const h12 = h % 12 || 12;
     return `${h12}:${m} ${ampm}`;
   }
   return time;
+}
+
+function to24Hour(time: string | null): string | null {
+  if (!time) return null;
+  const raw = time.trim().toLowerCase();
+  const ampmMatch = raw.match(/(am|pm)\s*$/);
+  const explicitAmPm = ampmMatch ? ampmMatch[1].toUpperCase() : null;
+  const numeric = raw.replace(/\s*(am|pm)\s*$/, "").trim();
+  const parts = numeric.split(":");
+  if (parts.length < 2) return null;
+  let h = parseInt(parts[0]);
+  const m = parts[1].replace(/\D+$/, "").padStart(2, "0").slice(0, 2);
+  if (isNaN(h)) return null;
+  if (explicitAmPm === "PM" && h < 12) h += 12;
+  if (explicitAmPm === "AM" && h === 12) h = 0;
+  return `${String(h).padStart(2, "0")}${m}00`;
+}
+
+function buildICS(event: PrismEvent, name: string, venue: string | null, description: string | null): string {
+  const date = event.date.split("/");
+  if (date.length !== 3) return "";
+  const [d, mo, y] = date;
+  const dateStr = `${y}${mo.padStart(2, "0")}${d.padStart(2, "0")}`;
+  const start = to24Hour(event.start_time) || "000000";
+  const end = to24Hour(event.end_time) || start;
+  const escape = (s: string) => s.replace(/[,;\\]/g, (m) => `\\${m}`).replace(/\n/g, "\\n");
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//PRISM HK//EN",
+    "BEGIN:VEVENT",
+    `UID:${dateStr}-${name.slice(0, 20).replace(/\s/g, "")}@prism.lgbt`,
+    `DTSTART:${dateStr}T${start}`,
+    `DTEND:${dateStr}T${end}`,
+    `SUMMARY:${escape(name)}`,
+    venue ? `LOCATION:${escape(venue)}` : "",
+    description ? `DESCRIPTION:${escape(description)}` : "",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].filter(Boolean).join("\r\n");
+}
+
+function downloadICS(event: PrismEvent, name: string, venue: string | null, description: string | null) {
+  const ics = buildICS(event, name, venue, description);
+  if (!ics) return;
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${name.replace(/[^\w]+/g, "-")}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 export default function EventPanel({
@@ -102,6 +163,14 @@ export default function EventPanel({
 
         {/* Header gradient */}
         <div className="p-6 pb-8 bg-gradient-to-br from-[#F0EEFF] to-[#FCE4EC]">
+          {event.image && (
+            <img
+              src={event.image}
+              alt={name}
+              className="w-full aspect-video object-cover rounded-xl mb-4 bg-white outline outline-1 outline-black/5"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
+          )}
           <div className="pr-10">
             {/* Date badge */}
             {eventDate && (
@@ -175,6 +244,7 @@ export default function EventPanel({
                 icon={<LocationIcon />}
                 label={isZh(language) ? "場地" : "Venue"}
                 value={venue}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue)}`}
               />
             )}
             {event.phone && (
@@ -253,6 +323,15 @@ export default function EventPanel({
             >
               {isZh(language) ? "了解更多 / 報名" : "Learn More / RSVP"} →
             </a>
+          )}
+
+          {eventDate && (
+            <button
+              onClick={() => downloadICS(event, name, venue, description)}
+              className="mt-3 block w-full text-center px-6 py-3 rounded-xl bg-white border border-[#E8E6F0] text-[#1E1B3A] font-semibold text-sm hover:border-[#A78BFA] hover:shadow-sm transition-[border-color,box-shadow]"
+            >
+              📅 {isZh(language) ? "加入日曆" : "Add to Calendar"}
+            </button>
           )}
         </div>
       </div>

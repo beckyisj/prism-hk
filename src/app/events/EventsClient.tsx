@@ -27,10 +27,17 @@ function parseDate(dateStr: string): Date | null {
 
 function formatTime(time: string | null): string {
   if (!time) return "";
-  const parts = time.split(":");
+  const raw = time.trim().toLowerCase();
+  const ampmMatch = raw.match(/(am|pm)\s*$/);
+  const explicitAmPm = ampmMatch ? ampmMatch[1].toUpperCase() : null;
+  const numeric = raw.replace(/\s*(am|pm)\s*$/, "").trim();
+  const parts = numeric.split(":");
   if (parts.length >= 2) {
-    const h = parseInt(parts[0]);
-    const m = parts[1];
+    let h = parseInt(parts[0]);
+    const m = parts[1].replace(/\D+$/, "").padStart(2, "0").slice(0, 2);
+    if (isNaN(h)) return time;
+    if (explicitAmPm === "PM" && h < 12) h += 12;
+    if (explicitAmPm === "AM" && h === 12) h = 0;
     const ampm = h >= 12 ? "PM" : "AM";
     const h12 = h % 12 || 12;
     return `${h12}:${m} ${ampm}`;
@@ -74,10 +81,39 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
     return { year: now.getFullYear(), month: now.getMonth() };
   });
 
+  const [search, setSearch] = useState("");
+  const [activeTag, setActiveTag] = useState<string>("");
+
   const today = new Date(new Date().toDateString());
 
+  const allTags = useMemo(() => {
+    const s = new Set<string>();
+    events.forEach((e) => e.tags.forEach((t) => s.add(t)));
+    return Array.from(s).sort();
+  }, [events]);
+
+  const filteredEvents = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const normalizedQ = q.replace(/[^a-z0-9一-鿿]+/g, "");
+    return events.filter((e) => {
+      if (activeTag && !e.tags.includes(activeTag)) return false;
+      if (q) {
+        const bag = [
+          e.name_en, e.name_zh, e.name_zhHans,
+          e.org_en, e.org_zh, e.org_zhHans,
+          e.description_en, e.description_zh, e.description_zhHans,
+          e.venue_en, e.venue_zh, e.venue_zhHans,
+          e.district, ...e.tags,
+        ].filter(Boolean).join(" ").toLowerCase();
+        const bagNorm = bag.replace(/[^a-z0-9一-鿿]+/g, "");
+        if (!bag.includes(q) && !bagNorm.includes(normalizedQ)) return false;
+      }
+      return true;
+    });
+  }, [events, search, activeTag]);
+
   const upcomingEvents = useMemo(() =>
-    events.filter((e) => {
+    filteredEvents.filter((e) => {
       const d = parseDate(e.date);
       return !d || d >= today;
     }).sort((a, b) => {
@@ -87,7 +123,7 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
       if (!db) return -1;
       return da.getTime() - db.getTime();
     }),
-    [events]
+    [filteredEvents]
   );
 
   // Calendar helpers
@@ -102,7 +138,7 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
   }, [calMonth]);
 
   const eventsOnDay = (day: number) => {
-    return events.filter((e) => {
+    return filteredEvents.filter((e) => {
       const d = parseDate(e.date);
       return d && d.getFullYear() === calMonth.year && d.getMonth() === calMonth.month && d.getDate() === day;
     });
@@ -148,6 +184,40 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
             {isZh(language) ? "日曆" : "Calendar"}
           </button>
         </div>
+      </div>
+
+      {/* Search + tag filter */}
+      <div className="mb-6 space-y-3">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={isZh(language) ? "搜尋活動或主辦單位..." : "Search events or organizations..."}
+          className="w-full px-4 py-2.5 rounded-xl border border-[#E8E6F0] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]"
+        />
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              onClick={() => setActiveTag("")}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                !activeTag ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+              }`}
+            >
+              {isZh(language) ? "全部" : "All"}
+            </button>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  activeTag === tag ? "bg-[#7B68EE] text-white border-[#7B68EE]" : "bg-white border-[#E8E6F0] text-[#6B6890] hover:border-[#A78BFA]"
+                }`}
+              >
+                {translateTag(tag, language)}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* List view */}
@@ -248,7 +318,7 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
 
           {/* Events for this month listed below calendar */}
           {(() => {
-            const monthEvents = events.filter((e) => {
+            const monthEvents = filteredEvents.filter((e) => {
               const d = parseDate(e.date);
               return d && d.getFullYear() === calMonth.year && d.getMonth() === calMonth.month;
             });
@@ -267,8 +337,8 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
         </div>
       )}
 
-      {/* Submit event CTA */}
-      <div className="text-center mb-16">
+      {/* CTAs: submit + subscribe */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
         <a
           href="https://forms.gle/XyjEMGrbT7baWZen7"
           target="_blank"
@@ -276,6 +346,13 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#7B68EE] to-[#E879F9] text-white rounded-full font-semibold text-sm hover:shadow-lg transition-[box-shadow]"
         >
           {isZh(language) ? "提交活動" : "Submit an Event"} →
+        </a>
+        <a
+          href="webcal://prism.lgbt/events.ics"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-[#E8E6F0] text-[#1E1B3A] rounded-full font-semibold text-sm hover:border-[#A78BFA] hover:shadow-sm transition-[border-color,box-shadow]"
+          title={isZh(language) ? "訂閱以在你的日曆中看到所有 PRISM 活動（自動更新）" : "Subscribe to see all PRISM events in your calendar (auto-updates)"}
+        >
+          📅 {isZh(language) ? "訂閱日曆" : "Subscribe to Calendar"}
         </a>
       </div>
 
@@ -340,7 +417,20 @@ function EventCard({ event, language, compact, onClick }: { event: PrismEvent; l
             <div className="text-[10px] uppercase tracking-wider opacity-80">
               {eventDate.toLocaleDateString(isZh(language) ? "zh-HK" : "en", { month: "short" })}
             </div>
+            <div className="text-[9px] uppercase tracking-wider opacity-70 mt-0.5">
+              {eventDate.toLocaleDateString(isZh(language) ? "zh-HK" : "en", { weekday: "short" })}
+            </div>
           </div>
+        )}
+
+        {/* Event image */}
+        {event.image && !compact && (
+          <img
+            src={event.image}
+            alt={name}
+            className="flex-shrink-0 w-20 h-20 rounded-xl object-cover bg-[#F5F4FA] outline outline-1 outline-black/5"
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+          />
         )}
 
         {/* Event details */}
