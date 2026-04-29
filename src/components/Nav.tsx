@@ -60,11 +60,7 @@ export default function Nav() {
 
   return (
     <>
-    {/* Beta banner */}
-    <div className="fixed top-0 left-0 right-0 z-[51] bg-gradient-to-r from-[#7B68EE] to-[#F5C55A] text-white text-center py-1.5 text-xs font-medium" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
-      {isZh(language) ? "🚀 我們正在測試中！歡迎提供反饋。" : "🚀 We're in beta! Your feedback helps us improve."}
-    </div>
-    <nav className="fixed top-7 left-0 right-0 z-50 bg-white border-b border-[#E8E6F0]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E6F0]">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
         {/* Logo */}
         <Link href="/" className="flex-shrink-0 flex items-center gap-2.5">
