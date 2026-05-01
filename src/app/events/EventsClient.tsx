@@ -7,7 +7,6 @@ import { type PrismEvent } from "@/lib/events";
 import { translateTag } from "@/lib/tagTranslations";
 import { translateDistrict } from "@/lib/districtTranslations";
 import EventPanel from "@/components/EventPanel";
-import MapEmbed from "@/components/MapEmbed";
 
 function parseDate(dateStr: string): Date | null {
   if (!dateStr) return null;
@@ -255,17 +254,6 @@ export default function EventsClient({ events = [] }: { events?: PrismEvent[] })
           </div>
         )}
       </div>
-
-      {/* Map embed (list view only; auto-scopes to filtered events) */}
-      {view === "list" && upcomingEvents.length > 0 && upcomingEvents.length <= 50 && (
-        <MapEmbed
-          places={upcomingEvents.map((e) => ({
-            name: e.name_en,
-            address: e.venue_en,
-            district: e.district,
-          }))}
-        />
-      )}
 
       {/* List view */}
       {view === "list" && (

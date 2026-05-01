@@ -7,7 +7,6 @@ import { type PrismEvent } from "@/lib/events";
 import { type Article } from "@/lib/articles";
 import ListingCard from "@/components/ListingCard";
 import ListingPanel from "@/components/ListingPanel";
-import MapEmbed from "@/components/MapEmbed";
 import { CATEGORIES, getCategoryName } from "@/lib/categories";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, isZh } from "@/lib/i18n";
@@ -435,17 +434,6 @@ export default function DirectoryClient({
               </select>
             </label>
           </div>
-
-          {/* Map embed — only show when there's an active filter so the map has a focus */}
-          {hasActiveFilters && filtered.length > 0 && filtered.length <= 100 && (
-            <MapEmbed
-              places={filtered.map((l) => ({
-                name: l.name_en,
-                address: l.address,
-                district: l.district_en,
-              }))}
-            />
-          )}
 
           {/* Card grid — 3 columns */}
           {paged.length > 0 ? (
