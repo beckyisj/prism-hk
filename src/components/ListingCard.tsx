@@ -7,7 +7,16 @@ import { bilingualText, t, isZh } from "@/lib/i18n";
 import { translateTag } from "@/lib/tagTranslations";
 import { translateDistrict } from "@/lib/districtTranslations";
 
-export default function ListingCard({ listing, onSelect }: { listing: Listing; onSelect?: (listing: Listing) => void }) {
+export default function ListingCard({
+  listing,
+  onSelect,
+  isNew = false,
+}: {
+  listing: Listing;
+  onSelect?: (listing: Listing) => void;
+  /** Show a "New" pill (used by the home page's Newly Listed tab) */
+  isNew?: boolean;
+}) {
   const { language } = useLanguage();
   const categories = listing.category.split(",").map((c) => c.trim()).filter(Boolean);
   const categoryInfos = categories.map((c) => getCategoryInfo(c));
@@ -61,6 +70,11 @@ export default function ListingCard({ listing, onSelect }: { listing: Listing; o
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mt-2">
+            {isNew && (
+              <span className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[linear-gradient(90deg,#7B68EE,#C084FC)] text-white">
+                ✨ {isZh(language) ? "新" : "New"}
+              </span>
+            )}
             {categoryInfos.map((catInfo, i) => (
               <span
                 key={i}

@@ -45,6 +45,7 @@ export default function HomeContent({
   categoryStats,
   events = [],
   featured = [],
+  newest = [],
   listingsCount,
   districtsCount,
   categoriesCount,
@@ -52,6 +53,7 @@ export default function HomeContent({
   categoryStats: { category: string; count: number }[];
   events?: PrismEvent[];
   featured?: Listing[];
+  newest?: Listing[];
   listingsCount: number;
   districtsCount: number;
   categoriesCount: number;
@@ -59,6 +61,8 @@ export default function HomeContent({
   const { language } = useLanguage();
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<PrismEvent | null>(null);
+  const [listingTab, setListingTab] = useState<"featured" | "new">("featured");
+  const shownListings = listingTab === "featured" ? featured : newest;
 
   const today = new Date(new Date().toDateString());
   const upcomingEvents = events
@@ -228,32 +232,78 @@ export default function HomeContent({
         </div>
       </section>
 
-      {/* ── 3. Featured Listings ── */}
+      {/* ── 3. Featured / Newly Listed ── */}
       <section className="max-w-5xl mx-auto px-6 py-12">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-[#1E1B3A]">
-            {isZh(language) ? "精選機構" : "Featured Listings"}
+            {listingTab === "featured"
+              ? (isZh(language) ? "精選機構" : "Featured Listings")
+              : (isZh(language) ? "最新加入" : "Newly Listed")}
           </h2>
           <p className="text-[#6B6890] mt-2 text-sm">
-            {isZh(language)
-              ? "經驗證的香港 LGBTQ+ 友善機構"
-              : "Verified LGBTQ+-friendly organizations across Hong Kong"}
+            {listingTab === "featured"
+              ? (isZh(language)
+                  ? "經驗證的香港 LGBTQ+ 友善機構"
+                  : "Verified LGBTQ+-friendly organizations across Hong Kong")
+              : (isZh(language)
+                  ? "最近加入名錄的機構"
+                  : "The latest additions to the directory")}
           </p>
+          <div
+            role="tablist"
+            aria-label={isZh(language) ? "機構列表" : "Listings"}
+            className="inline-flex mt-5 p-1 rounded-full bg-[#F0EEFF] border border-[#E8E6F0]"
+          >
+            {([
+              { key: "featured", label: isZh(language) ? "⭐ 精選" : "⭐ Featured" },
+              { key: "new", label: isZh(language) ? "✨ 最新加入" : "✨ Newly Listed" },
+            ] as const).map((tab) => (
+              <button
+                key={tab.key}
+                role="tab"
+                type="button"
+                aria-selected={listingTab === tab.key}
+                onClick={() => setListingTab(tab.key)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                  listingTab === tab.key
+                    ? "bg-white text-[#5746C7] shadow-sm"
+                    : "text-[#6B6890] hover:text-[#1E1B3A]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
-        {featured.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {featured.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} onSelect={setSelectedListing} />
+        {shownListings.length > 0 ? (
+          <div key={listingTab} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {shownListings.map((listing) => (
+              <ListingCard
+                key={listing.id}
+                listing={listing}
+                onSelect={setSelectedListing}
+                isNew={listingTab === "new"}
+              />
             ))}
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#E8E6F0] py-14 text-center">
             <img src="/empty-search.png" alt="" className="w-20 h-20 mx-auto mb-4 object-contain" />
             <p className="text-[#6B6890] text-sm">
-              {isZh(language) ? "暫無精選機構，請稍後再來！" : "No featured listings yet. Check back soon!"}
+              {listingTab === "featured"
+                ? (isZh(language) ? "暫無精選機構，請稍後再來！" : "No featured listings yet. Check back soon!")
+                : (isZh(language) ? "暫無新機構，請稍後再來！" : "No new listings yet. Check back soon!")}
             </p>
           </div>
         )}
+        <div className="text-center mt-8">
+          <Link
+            href="/directory"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#5746C7] hover:text-[#1E1B3A] transition-colors"
+          >
+            {isZh(language) ? "瀏覽全部機構" : "Browse the full directory"} →
+          </Link>
+        </div>
       </section>
 
       {/* ── 4. Upcoming Events ── */}

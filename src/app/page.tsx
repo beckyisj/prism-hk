@@ -20,6 +20,11 @@ export default async function HomePage() {
     const verified = listings.filter((l) => l.verified && !l.featured);
     return [...pinned, ...verified].slice(0, 6);
   })();
+  // Newly listed: most recently added rows (created_at is set on first insert
+  // and survives sheet re-syncs, so it tracks when Blake appended the org)
+  const newest = [...listings]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 6);
   const categoriesWithListings = categoryStats.filter((c) => c.count > 0).length;
 
   return (
@@ -35,6 +40,7 @@ export default async function HomePage() {
         categoryStats={categoryStats}
         events={events}
         featured={featured}
+        newest={newest}
         listingsCount={listings.length}
         districtsCount={districts.length || 18}
         categoriesCount={7}
